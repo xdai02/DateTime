@@ -64,7 +64,6 @@ typedef struct Time {
     int hour;
     int minute;
     int second;
-    int millisecond;
 } Time;
 
 typedef struct DateTime {
@@ -72,22 +71,126 @@ typedef struct DateTime {
     Time time;
 } DateTime;
 
+/**
+ * @brief Determine whether the year is a leap year.
+ * @param year The year.
+ * @return Returns true if the year is a leap year, otherwise returns false.
+ */
 bool is_leap_year(int year);
+
+/**
+ * @brief Get the number of days in the month.
+ * @param year The year.
+ * @param month The month.
+ * @return Returns the number of days in the month.
+ */
 int days_in_month(int year, int month);
+
+/**
+ * @brief Get the number of days in the year.
+ * @param year The year.
+ * @return Returns the number of days in the year.
+ */
 int days_in_year(int year);
+
+/**
+ * @brief Determine the given date is the n-th day of the year.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @return Returns the n-th day of the year.
+ */
 int nth_day_of_year(int year, int month, int day);
+
+/**
+ * @brief Determine the given date is the n-th day of the week.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @return Returns the n-th day of the week.
+ */
 Day nth_day_of_week(int year, int month, int day);
 
+/**
+ * @brief Create a Date object.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @return Returns the Date object.
+ */
 Date date_create(int year, int month, int day);
+
+/**
+ * @brief Get the current date.
+ * @return Returns the Date object.
+ */
 Date date_now();
+
+/**
+ * @brief Compare two Date objects.
+ * @param date1 The first Date object.
+ * @param date2 The second Date object.
+ * @return Returns 1 if date1 is greater than date2.
+ *         Returns -1 if date1 is less than date2.
+ *         Returns 0 if date1 is equal to date2.
+ */
 int date_compare(Date date1, Date date2);
+
+/**
+ * @brief Add days to the date.
+ * @param date The Date object.
+ * @param days The number of days to add/subtract.
+ * @return Returns the new Date object.
+ */
 Date date_add(Date date, int days);
+
+/**
+ * @brief Get the difference between two Date objects.
+ * @param date1 The first Date object.
+ * @param date2 The second Date object.
+ * @return Returns the difference between two Date objects.
+ */
 int date_diff(Date date1, Date date2);
 
-Time time_create(int hour, int minute, int second, int millisecond);
+/**
+ * @brief Create a Time object.
+ * @param hour The hour.
+ * @param minute The minute.
+ * @param second The second.
+ * @return Returns the Time object.
+ */
+Time time_create(int hour, int minute, int second);
+
+/**
+ * @brief Get the current time.
+ * @return Returns the Time object.
+ */
 Time time_now();
+
+/**
+ * @brief Compare two Time objects.
+ * @param time1 The first Time object.
+ * @param time2 The second Time object.
+ * @return Returns 1 if time1 is greater than time2.
+ *         Returns -1 if time1 is less than time2.
+ *         Returns 0 if time1 is equal to time2.
+ */
 int time_compare(Time time1, Time time2);
-Time time_add(Time time, int milliseconds);
+
+/**
+ * @brief Add seconds to the time.
+ * @param time The Time object.
+ * @param seconds The number of seconds to add/subtract.
+ * @return Returns the new Time object.
+ */
+Time time_add(Time time, int second);
+
+/**
+ * @brief Get the difference between two Time objects.
+ * @param time1 The first Time object.
+ * @param time2 The second Time object.
+ * @return Returns the difference between two Time objects.
+ */
 int time_diff(Time time1, Time time2);
 
 #endif

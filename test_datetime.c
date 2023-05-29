@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <assert.h>
+#include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 #include "datetime.h"
 
 void test_is_leap_year() {
@@ -190,6 +191,12 @@ void test_date_add() {
     assert(new_date.month == JAN);
     assert(new_date.day == 1);
 
+    date = date_create(2023, MAY, 29);
+    new_date = date_add(date, 10000);
+    assert(new_date.year == 2050);
+    assert(new_date.month == OCT);
+    assert(new_date.day == 14);
+
     date = date_create(2000, JAN, 1);
     new_date = date_add(date, -1);
     assert(new_date.year == 1999);
@@ -215,12 +222,161 @@ void test_date_add() {
     assert(new_date.day == 5);
 
     date = date_create(2023, MAY, 29);
-    new_date = date_add(date, 10000);
-    assert(new_date.year == 2050);
-    assert(new_date.month == OCT);
-    assert(new_date.day == 14);
+    new_date = date_add(date, -10000);
+    assert(new_date.year == 1996);
+    assert(new_date.month == JAN);
+    assert(new_date.day == 11);
 
     printf("[PASS] date_add\n");
+}
+
+void test_date_diff() {
+    Date date1;
+    Date date2;
+
+    date1 = date_create(2000, JAN, 1);
+    date2 = date_create(2000, JAN, 1);
+    assert(date_diff(date1, date2) == 0);
+
+    date1 = date_create(2000, JAN, 1);
+    date2 = date_create(2000, JAN, 2);
+    assert(date_diff(date1, date2) == -1);
+
+    date1 = date_create(2000, FEB, 1);
+    date2 = date_create(2000, MAR, 1);
+    assert(date_diff(date1, date2) == -29);
+
+    date1 = date_create(2023, FEB, 1);
+    date2 = date_create(2023, MAR, 1);
+    assert(date_diff(date1, date2) == -28);
+
+    date1 = date_create(2024, DEC, 31);
+    date2 = date_create(2023, MAY, 29);
+    assert(date_diff(date1, date2) == 582);
+
+    date1 = date_create(3000, MAY, 29);
+    date2 = date_create(2023, MAY, 29);
+    assert(date_diff(date1, date2) == 356842);
+
+    printf("[PASS] date_diff\n");
+}
+
+void test_time_create() {
+    Time time;
+
+    time = time_create(0, 0, 0);
+    assert(time.hour == 0);
+    assert(time.minute == 0);
+    assert(time.second == 0);
+
+    time = time_create(23, 59, 59);
+    assert(time.hour == 23);
+    assert(time.minute == 59);
+    assert(time.second == 59);
+
+    printf("[PASS] time_create\n");
+}
+
+void test_time_now() {
+    const int DELAY = 2;
+
+    Time t1 = time_now();
+    time_t t2 = time(NULL);
+    struct tm tm = *localtime(&t2);
+
+    assert(t1.hour == tm.tm_hour);
+    assert(t1.minute == tm.tm_min);
+    assert(t1.second <= tm.tm_sec + DELAY);
+
+    printf("[PASS] time_now\n");
+}
+
+void test_time_compare() {
+    Time time1 = time_create(7, 30, 0);
+    Time time2 = time_create(16, 0, 0);
+    assert(time_compare(time1, time2) < 0);
+    assert(time_compare(time2, time1) > 0);
+    assert(time_compare(time1, time1) == 0);
+
+    printf("[PASS] time_compare\n");
+}
+
+void test_time_add() {
+    Time time;
+    Time new_time;
+
+    time = time_create(0, 0, 0);
+    new_time = time_add(time, 0);
+    assert(new_time.hour == 0);
+    assert(new_time.minute == 0);
+    assert(new_time.second == 0);
+
+    time = time_create(0, 0, 0);
+    new_time = time_add(time, 1);
+    assert(new_time.hour == 0);
+    assert(new_time.minute == 0);
+    assert(new_time.second == 1);
+
+    time = time_create(23, 59, 59);
+    new_time = time_add(time, 1);
+    assert(new_time.hour == 0);
+    assert(new_time.minute == 0);
+    assert(new_time.second == 0);
+
+    time = time_create(11, 30, 0);
+    new_time = time_add(time, 3601);
+    assert(new_time.hour == 12);
+    assert(new_time.minute == 30);
+    assert(new_time.second == 1);
+
+    time = time_create(0, 0, 0);
+    new_time = time_add(time, -1);
+    assert(new_time.hour == 23);
+    assert(new_time.minute == 59);
+    assert(new_time.second == 59);
+
+    time = time_create(11, 30, 0);
+    new_time = time_add(time, -3601);
+    assert(new_time.hour == 10);
+    assert(new_time.minute == 29);
+    assert(new_time.second == 59);
+
+    printf("[PASS] time_add\n");
+}
+
+void test_time_diff() {
+    Time time1;
+    Time time2;
+
+    time1 = time_create(0, 0, 0);
+    time2 = time_create(0, 0, 0);
+    assert(time_diff(time1, time2) == 0);
+
+    time1 = time_create(23, 59, 59);
+    time2 = time_create(0, 0, 0);
+    assert(time_diff(time1, time2) == 86399);
+
+    time1 = time_create(12, 0, 0);
+    time2 = time_create(12, 0, 0);
+    assert(time_diff(time1, time2) == 0);
+
+    time1 = time_create(12, 0, 0);
+    time2 = time_create(13, 0, 0);
+    assert(time_diff(time1, time2) == -3600);
+
+    time1 = time_create(12, 0, 0);
+    time2 = time_create(11, 0, 0);
+    assert(time_diff(time1, time2) == 3600);
+
+    time1 = time_create(12, 0, 0);
+    time2 = time_create(12, 30, 0);
+    assert(time_diff(time1, time2) == -1800);
+
+    time1 = time_create(12, 30, 0);
+    time2 = time_create(12, 0, 0);
+    assert(time_diff(time1, time2) == 1800);
+
+    printf("[PASS] time_diff\n");
 }
 
 int main() {
@@ -234,6 +390,13 @@ int main() {
     test_date_now();
     test_date_compare();
     test_date_add();
+    test_date_diff();
+
+    test_time_create();
+    test_time_now();
+    test_time_compare();
+    test_time_add();
+    test_time_diff();
 
     printf("[PASS] All\n");
     return 0;
