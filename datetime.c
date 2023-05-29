@@ -266,9 +266,10 @@ int date_diff(Date date1, Date date2) {
  * @param hour The hour.
  * @param minute The minute.
  * @param second The second.
+ * @param millisecond The millisecond.
  * @return Returns true if the time is valid, otherwise returns false.
  */
-static bool __is_valid_time(int hour, int minute, int second) {
+static bool __is_valid_time(int hour, int minute, int second, int millisecond) {
     if (hour < 0 || hour >= HOURS_PER_DAY) {
         fprintf(stderr, "Error: hour must be 0 ~ 23.\n");
         return false;
@@ -284,6 +285,11 @@ static bool __is_valid_time(int hour, int minute, int second) {
         return false;
     }
 
+    if (millisecond < 0 || millisecond >= MILLISECONDS_PER_SECOND) {
+        fprintf(stderr, "Error: millisecond must be 0 ~ 999.\n");
+        return false;
+    }
+
     return true;
 }
 
@@ -292,14 +298,16 @@ static bool __is_valid_time(int hour, int minute, int second) {
  * @param hour The hour.
  * @param minute The minute.
  * @param second The second.
+ * @param millisecond The millisecond.
  * @return Returns the Time object.
  */
-Time time_create(int hour, int minute, int second) {
+Time time_create(int hour, int minute, int second, int millisecond) {
     Time time;
-    exit_if_fail(__is_valid_time(hour, minute, second));
+    exit_if_fail(__is_valid_time(hour, minute, second, millisecond));
     time.hour = hour;
     time.minute = minute;
     time.second = second;
+    time.millisecond = millisecond;
     return time;
 }
 
@@ -319,11 +327,11 @@ Time time_now() {
 
 #ifdef _WIN32
     GetLocalTime(&st);
-    time = time_create(st.wHour, st.wMinute, st.wSecond);
+    time = time_create(st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 #else
     gettimeofday(&tv, NULL);
     tm = localtime(&tv.tv_sec);
-    time = time_create(tm->tm_hour, tm->tm_min, tm->tm_sec);
+    time = time_create(tm->tm_hour, tm->tm_min, tm->tm_sec, tv.tv_usec / MILLISECONDS_PER_SECOND);
 #endif
 
     return time;
@@ -338,8 +346,8 @@ Time time_now() {
  *         Returns 0 if time1 is equal to time2.
  */
 int time_compare(Time time1, Time time2) {
-    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second));
-    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second));
+    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second, time1.millisecond));
+    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second, time2.millisecond));
 
     if (time1.hour > time2.hour) {
         return 1;
@@ -359,25 +367,38 @@ int time_compare(Time time1, Time time2) {
         return -1;
     }
 
+    if (time1.millisecond > time2.millisecond) {
+        return 1;
+    } else if (time1.millisecond < time2.millisecond) {
+        return -1;
+    }
+
     return 0;
 }
 
 /**
  * @brief Add seconds to the time.
  * @param time The Time object.
- * @param seconds The number of seconds to add/subtract.
+ * @param milliseconds The number of milliseconds to add/subtract.
  * @return Returns the new Time object.
  */
-Time time_add(Time time, int seconds) {
-    struct tm tm_time = {0};
-    exit_if_fail(__is_valid_time(time.hour, time.minute, time.second));
+Time time_add(Time time, int milliseconds) {
+    int total_milliseconds = 0;
+    exit_if_fail(__is_valid_time(time.hour, time.minute, time.second, time.millisecond));
 
-    tm_time.tm_hour = time.hour;
-    tm_time.tm_min = time.minute;
-    tm_time.tm_sec = time.second + seconds;
+    total_milliseconds = time.millisecond + milliseconds;
 
-    mktime(&tm_time);
-    return time_create(tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
+    time.second += total_milliseconds / MILLISECONDS_PER_SECOND;
+    time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND;
+
+    time.minute += time.second / SECONDS_PER_MINUTE;
+    time.second = time.second % SECONDS_PER_MINUTE;
+
+    time.hour += time.minute / MINUTES_PER_HOUR;
+    time.minute = time.minute % MINUTES_PER_HOUR;
+
+    time.hour = time.hour % HOURS_PER_DAY;
+    return time;
 }
 
 /**
@@ -387,24 +408,13 @@ Time time_add(Time time, int seconds) {
  * @return Returns the difference between two Time objects.
  */
 int time_diff(Time time1, Time time2) {
-    struct tm tm_time1 = {0};
-    struct tm tm_time2 = {0};
-    time_t time_seconds1;
-    time_t time_seconds2;
-    double diff_seconds = 0;
+    int milliseconds1;
+    int milliseconds2;
 
-    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second));
-    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second));
+    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second, time1.millisecond));
+    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second, time2.millisecond));
 
-    tm_time1.tm_hour = time1.hour;
-    tm_time1.tm_min = time1.minute;
-    tm_time1.tm_sec = time1.second;
-    tm_time2.tm_hour = time2.hour;
-    tm_time2.tm_min = time2.minute;
-    tm_time2.tm_sec = time2.second;
-
-    time_seconds1 = mktime(&tm_time1);
-    time_seconds2 = mktime(&tm_time2);
-    diff_seconds = difftime(time_seconds1, time_seconds2);
-    return (int)diff_seconds;
+    milliseconds1 = (time1.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time1.minute * SECONDS_PER_MINUTE + time1.second) * MILLISECONDS_PER_SECOND + time1.millisecond;
+    milliseconds2 = (time2.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time2.minute * SECONDS_PER_MINUTE + time2.second) * MILLISECONDS_PER_SECOND + time2.millisecond;
+    return milliseconds1 - milliseconds2;
 }

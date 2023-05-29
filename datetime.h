@@ -64,6 +64,7 @@ typedef struct Time {
     int hour;
     int minute;
     int second;
+    int millisecond;
 } Time;
 
 typedef struct DateTime {
@@ -157,9 +158,10 @@ int date_diff(Date date1, Date date2);
  * @param hour The hour.
  * @param minute The minute.
  * @param second The second.
+ * @param millisecond The millisecond.
  * @return Returns the Time object.
  */
-Time time_create(int hour, int minute, int second);
+Time time_create(int hour, int minute, int second, int millisecond);
 
 /**
  * @brief Get the current time.
@@ -180,10 +182,10 @@ int time_compare(Time time1, Time time2);
 /**
  * @brief Add seconds to the time.
  * @param time The Time object.
- * @param seconds The number of seconds to add/subtract.
+ * @param milliseconds The number of milliseconds to add/subtract.
  * @return Returns the new Time object.
  */
-Time time_add(Time time, int second);
+Time time_add(Time time, int milliseconds);
 
 /**
  * @brief Get the difference between two Time objects.
