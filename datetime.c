@@ -58,15 +58,19 @@ int days_in_year(int year) {
 }
 
 int nth_day_of_year(int year, int month, int day) {
+    int i = 0;
     int days = 0;
-    for (int i = 1; i < month; i++) {
+    for (i = 1; i < month; i++) {
         days += days_in_month(year, i);
     }
     return days + day;
 }
 
 Date date_create(int year, int month, int day) {
-    Date date = {year, month, day};
+    Date date;
+    date.year = year;
+    date.month = month;
+    date.day = day;
     return date;
 }
 
@@ -106,30 +110,36 @@ Date date_add(Date date, int days) {
 
     mktime(&tm_date);
 
-    Date new_date = {tm_date.tm_year + 1900, tm_date.tm_mon + 1, tm_date.tm_mday};
-    return new_date;
+    return date_create(tm_date.tm_year + 1900, tm_date.tm_mon + 1, tm_date.tm_mday);
 }
 
 int date_diff(Date date1, Date date2) {
     struct tm tm_date1 = {0};
+    struct tm tm_date2 = {0};
+    time_t time1;
+    time_t time2;
+    double diff_seconds = 0;
+
     tm_date1.tm_year = date1.year - 1900;
     tm_date1.tm_mon = date1.month - 1;
     tm_date1.tm_mday = date1.day;
-
-    struct tm tm_date2 = {0};
     tm_date2.tm_year = date2.year - 1900;
     tm_date2.tm_mon = date2.month - 1;
     tm_date2.tm_mday = date2.day;
 
-    time_t time1 = mktime(&tm_date1);
-    time_t time2 = mktime(&tm_date2);
+    time1 = mktime(&tm_date1);
+    time2 = mktime(&tm_date2);
 
-    double diff_seconds = difftime(time1, time2);
+    diff_seconds = difftime(time1, time2);
     return (int)(diff_seconds / SECONDS_PER_DAY);
 }
 
 Time time_create(int hour, int minute, int second, int millisecond) {
-    Time time = {hour, minute, second, millisecond};
+    Time time;
+    time.hour = hour;
+    time.minute = minute;
+    time.second = second;
+    time.millisecond = millisecond;
     return time;
 }
 
@@ -138,13 +148,18 @@ Time time_now() {
 
 #ifdef _WIN32
     SYSTEMTIME st;
-    GetLocalTime(&st);
-    time = (Time){st.wHour, st.wMinute, st.wSecond, st.wMilliseconds};
 #else
     struct timeval tv;
+    struct tm *tm;
+#endif
+
+#ifdef _WIN32
+    GetLocalTime(&st);
+    time = time_create(st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+#else
     gettimeofday(&tv, NULL);
-    struct tm *tm = localtime(&tv.tv_sec);
-    time = (Time){tm->tm_hour, tm->tm_min, tm->tm_sec, tv.tv_usec / MICROSECONDS_PER_MILLISECOND};
+    tm = localtime(&tv.tv_sec);
+    time = time_create(tm->tm_hour, tm->tm_min, tm->tm_sec, tv.tv_usec / MICROSECONDS_PER_MILLISECOND);
 #endif
 
     return time;
@@ -179,15 +194,21 @@ int time_compare(Time time1, Time time2) {
 }
 
 Time time_add(Time time, int milliseconds) {
-    int total_milliseconds = time.millisecond + milliseconds;
+    int total_milliseconds = 0;
+    int total_seconds = 0;
+    int total_minutes = 0;
+    int total_hours = 0;
 
-    int total_seconds = time.second + total_milliseconds / MILLISECONDS_PER_SECOND;
+
+    total_milliseconds = time.millisecond + milliseconds;
+
+    total_seconds = time.second + total_milliseconds / MILLISECONDS_PER_SECOND;
     time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND;
 
-    int total_minutes = time.minute + total_seconds / SECONDS_PER_MINUTE;
+    total_minutes = time.minute + total_seconds / SECONDS_PER_MINUTE;
     time.second = total_seconds % SECONDS_PER_MINUTE;
 
-    int total_hours = time.hour + total_minutes / MINUTES_PER_HOUR;
+    total_hours = time.hour + total_minutes / MINUTES_PER_HOUR;
     time.minute = total_minutes % MINUTES_PER_HOUR;
 
     time.hour = total_hours % HOURS_PER_DAY;

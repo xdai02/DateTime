@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <assert.h>
 #include "datetime.h"
 
 int main() {
-    printf("demo\n");
+    printf("test\n");
 
     return 0;
 }
