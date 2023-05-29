@@ -66,6 +66,17 @@ int nth_day_of_year(int year, int month, int day) {
     return days + day;
 }
 
+Day nth_day_of_week(int year, int month, int day) {
+    int h;
+    if (month < 3) {
+        month += 12;
+        year--;
+    }
+    h = (day + (26 * (month + 1)) / 10 + year + year / 4 - year / 100 + year / 400) % DAYS_IN_WEEK;
+    h = (h + 6) % DAYS_IN_WEEK;
+    return (Day)h;
+}
+
 Date date_create(int year, int month, int day) {
     Date date;
     date.year = year;

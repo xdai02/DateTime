@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <time.h>
 #include "datetime.h"
 
 void test_is_leap_year() {
@@ -14,6 +15,8 @@ void test_is_leap_year() {
     assert(is_leap_year(3000) == false);
     assert(is_leap_year(4000) == true);
     assert(is_leap_year(9999) == false);
+
+    printf("[PASS] is_leap_year\n");
 }
 
 void test_days_in_month() {
@@ -30,6 +33,8 @@ void test_days_in_month() {
     assert(days_in_month(2023, OCT) == 31);
     assert(days_in_month(2023, NOV) == 30);
     assert(days_in_month(2023, DEC) == 31);
+
+    printf("[PASS] days_in_month\n");
 }
 
 void test_days_in_year() {
@@ -44,6 +49,8 @@ void test_days_in_year() {
     assert(days_in_year(3000) == DAYS_IN_COMMON_YEAR);
     assert(days_in_year(4000) == DAYS_IN_LEAP_YEAR);
     assert(days_in_year(9999) == DAYS_IN_COMMON_YEAR);
+
+    printf("[PASS] days_in_year\n");
 }
 
 void test_nth_day_of_year() {
@@ -63,6 +70,157 @@ void test_nth_day_of_year() {
     assert(nth_day_of_year(2023, MAR, 1) == 60);
     assert(nth_day_of_year(2023, NOV, 30) == 334);
     assert(nth_day_of_year(2023, DEC, 31) == DAYS_IN_COMMON_YEAR);
+
+    printf("[PASS] nth_day_of_year\n");
+}
+
+void test_nth_day_of_week() {
+    assert(nth_day_of_week(1900, JAN, 1) == MON);
+    assert(nth_day_of_week(1900, DEC, 31) == MON);
+    assert(nth_day_of_week(1970, FEB, 1) == SUN);
+    assert(nth_day_of_week(1970, DEC, 1) == TUE);
+    assert(nth_day_of_week(2000, JAN, 31) == MON);
+    assert(nth_day_of_week(2000, FEB, 1) == TUE);
+    assert(nth_day_of_week(2000, FEB, 29) == TUE);
+    assert(nth_day_of_week(2000, MAR, 1) == WED);
+    assert(nth_day_of_week(2000, NOV, 30) == THU);
+    assert(nth_day_of_week(2000, DEC, 31) == SUN);
+    assert(nth_day_of_week(2023, JAN, 1) == SUN);
+    assert(nth_day_of_week(2023, FEB, 1) == WED);
+    assert(nth_day_of_week(2023, FEB, 28) == TUE);
+    assert(nth_day_of_week(2023, MAR, 1) == WED);
+    assert(nth_day_of_week(2023, NOV, 30) == THU);
+    assert(nth_day_of_week(2023, DEC, 31) == SUN);
+
+    printf("[PASS] nth_day_of_week\n");
+}
+
+void test_date_create() {
+    Date date;
+
+    date = date_create(2020, FEB, 29);
+    assert(date.year == 2020);
+    assert(date.month == FEB);
+    assert(date.day == 29);
+
+    date = date_create(2000, DEC, 31);
+    assert(date.year == 2000);
+    assert(date.month == DEC);
+    assert(date.day == 31);
+
+    date = date_create(2023, JAN, 1);
+    assert(date.year == 2023);
+    assert(date.month == JAN);
+    assert(date.day == 1);
+
+    printf("[PASS] date_create\n");
+}
+
+void test_date_now() {
+    Date date = date_now();
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    assert(date.year == tm.tm_year + 1900);
+    assert(date.month == tm.tm_mon + 1);
+    assert(date.day == tm.tm_mday);
+
+    printf("[PASS] date_now\n");
+}
+
+void test_date_compare() {
+    Date date1 = date_create(2023, JAN, 1);
+    Date date2 = date_create(2000, DEC, 31);
+    assert(date_compare(date1, date2) > 0);
+    assert(date_compare(date2, date1) < 0);
+    assert(date_compare(date1, date1) == 0);
+
+    printf("[PASS] date_compare\n");
+}
+
+void test_date_add() {
+    Date date;
+    Date new_date;
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 0);
+    assert(new_date.year == 2000);
+    assert(new_date.month == JAN);
+    assert(new_date.day == 1);
+
+    date = date_create(2000, JAN, 31);
+    new_date = date_add(date, 1);
+    assert(new_date.year == 2000);
+    assert(new_date.month == FEB);
+    assert(new_date.day == 1);
+
+    date = date_create(2000, FEB, 28);
+    new_date = date_add(date, 1);
+    assert(new_date.year == 2000);
+    assert(new_date.month == FEB);
+    assert(new_date.day == 29);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 30);
+    assert(new_date.year == 2000);
+    assert(new_date.month == JAN);
+    assert(new_date.day == 31);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 31);
+    assert(new_date.year == 2000);
+    assert(new_date.month == FEB);
+    assert(new_date.day == 1);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 100);
+    assert(new_date.year == 2000);
+    assert(new_date.month == APR);
+    assert(new_date.day == 10);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 365);
+    assert(new_date.year == 2000);
+    assert(new_date.month == DEC);
+    assert(new_date.day == 31);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, 366);
+    assert(new_date.year == 2001);
+    assert(new_date.month == JAN);
+    assert(new_date.day == 1);
+
+    date = date_create(2000, JAN, 1);
+    new_date = date_add(date, -1);
+    assert(new_date.year == 1999);
+    assert(new_date.month == DEC);
+    assert(new_date.day == 31);
+
+    date = date_create(2000, MAR, 1);
+    new_date = date_add(date, -28);
+    assert(new_date.year == 2000);
+    assert(new_date.month == FEB);
+    assert(new_date.day == 2);
+
+    date = date_create(2000, MAR, 1);
+    new_date = date_add(date, -29);
+    assert(new_date.year == 2000);
+    assert(new_date.month == FEB);
+    assert(new_date.day == 1);
+
+    date = date_create(2000, MAR, 1);
+    new_date = date_add(date, -1000);
+    assert(new_date.year == 1997);
+    assert(new_date.month == JUN);
+    assert(new_date.day == 5);
+
+    date = date_create(2023, MAY, 29);
+    new_date = date_add(date, 10000);
+    assert(new_date.year == 2050);
+    assert(new_date.month == OCT);
+    assert(new_date.day == 14);
+
+    printf("[PASS] date_add\n");
 }
 
 int main() {
@@ -70,6 +228,13 @@ int main() {
     test_days_in_month();
     test_days_in_year();
     test_nth_day_of_year();
+    test_nth_day_of_week();
 
+    test_date_create();
+    test_date_now();
+    test_date_compare();
+    test_date_add();
+
+    printf("[PASS] All\n");
     return 0;
 }

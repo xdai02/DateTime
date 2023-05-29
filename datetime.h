@@ -44,6 +44,16 @@ typedef enum Month {
     DEC
 } Month;
 
+typedef enum Day {
+    SUN,
+    MON = 1,
+    TUE,
+    WED,
+    THU,
+    FRI,
+    SAT
+} Day;
+
 typedef struct Date {
     int year;
     int month;
@@ -57,10 +67,16 @@ typedef struct Time {
     int millisecond;
 } Time;
 
+typedef struct DateTime {
+    Date date;
+    Time time;
+} DateTime;
+
 bool is_leap_year(int year);
 int days_in_month(int year, int month);
 int days_in_year(int year);
 int nth_day_of_year(int year, int month, int day);
+Day nth_day_of_week(int year, int month, int day);
 
 Date date_create(int year, int month, int day);
 Date date_now();
