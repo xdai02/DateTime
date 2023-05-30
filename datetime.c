@@ -53,6 +53,70 @@ bool is_leap_year(int year) {
 }
 
 /**
+ * @brief Get the full name of the month.
+ * @param month The month.
+ * @return Returns the full name of the month.
+ */
+const char *month_name(Month month) {
+    switch (month) {
+    case JAN:
+        return "January";
+    case FEB:
+        return "February";
+    case MAR:
+        return "March";
+    case APR:
+        return "April";
+    case MAY:
+        return "May";
+    case JUN:
+        return "June";
+    case JUL:
+        return "July";
+    case AUG:
+        return "August";
+    case SEP:
+        return "September";
+    case OCT:
+        return "October";
+    case NOV:
+        return "November";
+    case DEC:
+        return "December";
+    default:
+        fprintf(stderr, "Error: month must be 1 ~ 12.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/**
+ * @brief Get the full name of the day.
+ * @param day The day.
+ * @return Returns the full name of the day.
+ */
+const char *day_name(Day day) {
+    switch (day) {
+    case SUN:
+        return "Sunday";
+    case MON:
+        return "Monday";
+    case TUE:
+        return "Tuesday";
+    case WED:
+        return "Wednesday";
+    case THU:
+        return "Thursday";
+    case FRI:
+        return "Friday";
+    case SAT:
+        return "Saturday";
+    default:
+        fprintf(stderr, "Error: day must be 0 ~ 6.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/**
  * @brief Get the number of days in the month.
  * @param year The year.
  * @param month The month.
@@ -162,8 +226,39 @@ Day nth_day_of_week(int year, int month, int day) {
     return (Day)h;
 }
 
-char *calendar(int year, int month) {
-    
+const char *calendar(int year, int month) {
+    char *calendar = NULL;
+    int days = 0;
+    Day first_day;
+    int k = 0;
+    int i = 0;
+
+    calendar = (char *)malloc(sizeof(char) * 256);
+    return_value_if_fail(calendar != NULL, NULL);
+
+    sprintf(calendar, "            %s %04d\n", month_name(month), year);
+    days = days_in_month(year, month);
+    first_day = nth_day_of_week(year, month, 1);
+    sprintf(calendar, "%s Sun  Mon  Tue  Wed  Thu  Fri  Sat\n", calendar);
+
+    for (k = 0; k < first_day; k++) {
+        sprintf(calendar, "%s     ", calendar);
+    }
+
+    for (i = 1; i <= days; i++) {
+        sprintf(calendar, "%s%4d ", calendar, i);
+        k++;
+        if (k > 6) {
+            k = 0;
+            sprintf(calendar, "%s\n", calendar);
+        }
+    }
+
+    if (k != 0) {
+        sprintf(calendar, "%s\n", calendar);
+    }
+
+    return calendar;
 }
 
 /**

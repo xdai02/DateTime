@@ -21,6 +21,35 @@ void test_is_leap_year() {
     printf("[PASS] is_leap_year\n");
 }
 
+void test_month_name() {
+    assert(strcmp(month_name(JAN), "January") == 0);
+    assert(strcmp(month_name(FEB), "February") == 0);
+    assert(strcmp(month_name(MAR), "March") == 0);
+    assert(strcmp(month_name(APR), "April") == 0);
+    assert(strcmp(month_name(MAY), "May") == 0);
+    assert(strcmp(month_name(JUN), "June") == 0);
+    assert(strcmp(month_name(JUL), "July") == 0);
+    assert(strcmp(month_name(AUG), "August") == 0);
+    assert(strcmp(month_name(SEP), "September") == 0);
+    assert(strcmp(month_name(OCT), "October") == 0);
+    assert(strcmp(month_name(NOV), "November") == 0);
+    assert(strcmp(month_name(DEC), "December") == 0);
+
+    printf("[PASS] month_name\n");
+}
+
+void test_day_name() {
+    assert(strcmp(day_name(SUN), "Sunday") == 0);
+    assert(strcmp(day_name(MON), "Monday") == 0);
+    assert(strcmp(day_name(TUE), "Tuesday") == 0);
+    assert(strcmp(day_name(WED), "Wednesday") == 0);
+    assert(strcmp(day_name(THU), "Thursday") == 0);
+    assert(strcmp(day_name(FRI), "Friday") == 0);
+    assert(strcmp(day_name(SAT), "Saturday") == 0);
+
+    printf("[PASS] day_name\n");
+}
+
 void test_days_in_month() {
     assert(days_in_month(2020, FEB) == DAYS_IN_FEBRUARY_LEAP);
     assert(days_in_month(2023, JAN) == 31);
@@ -719,6 +748,8 @@ void test_datetime_to_string() {
 
 int main() {
     test_is_leap_year();
+    test_month_name();
+    test_day_name();
     test_days_in_month();
     test_days_in_year();
     test_nth_day_of_year();

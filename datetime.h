@@ -50,7 +50,7 @@ typedef enum Month {
 
 typedef enum Day {
     SUN,
-    MON = 1,
+    MON,
     TUE,
     WED,
     THU,
@@ -90,6 +90,20 @@ typedef struct DateTime {
  * @return Returns true if the year is a leap year, otherwise returns false.
  */
 bool is_leap_year(int year);
+
+/**
+ * @brief Get the full name of the month.
+ * @param month The month.
+ * @return Returns the full name of the month.
+ */
+const char *month_name(Month month);
+
+/**
+ * @brief Get the full name of the day.
+ * @param day The day.
+ * @return Returns the full name of the day.
+ */
+const char *day_name(Day day);
 
 /**
  * @brief Get the number of days in the month.
