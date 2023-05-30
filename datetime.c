@@ -162,6 +162,110 @@ Day nth_day_of_week(int year, int month, int day) {
     return (Day)h;
 }
 
+char *calendar(int year, int month) {
+    
+}
+
+/**
+ * @brief Determine whether the time interval is valid.
+ * @param time_interval The TimeInterval object.
+ * @return Returns true if the time interval is valid, otherwise returns false.
+ */
+static bool __is_valid_time_interval(TimeInterval time_interval) {
+    if (time_interval.days < 0) {
+        fprintf(stderr, "Error: days must be greater than or equal to 0.\n");
+        return false;
+    }
+
+    if (time_interval.hours < 0 || time_interval.hours >= HOURS_PER_DAY) {
+        fprintf(stderr, "Error: hours must be 0 ~ 23.\n");
+        return false;
+    }
+
+    if (time_interval.minutes < 0 || time_interval.minutes >= MINUTES_PER_HOUR) {
+        fprintf(stderr, "Error: minutes must be 0 ~ 59.\n");
+        return false;
+    }
+
+    if (time_interval.seconds < 0 || time_interval.seconds >= SECONDS_PER_MINUTE) {
+        fprintf(stderr, "Error: seconds must be 0 ~ 59.\n");
+        return false;
+    }
+
+    if (time_interval.milliseconds < 0 || time_interval.milliseconds >= MILLISECONDS_PER_SECOND) {
+        fprintf(stderr, "Error: milliseconds must be 0 ~ 999.\n");
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Normalize the time interval.
+ * @param time_interval The TimeInterval object.
+ */
+static void __time_interval_normalize(TimeInterval *time_interval) {
+    return_if_fail(time_interval != NULL);
+
+    if (time_interval->milliseconds >= MILLISECONDS_PER_SECOND) {
+        time_interval->seconds += time_interval->milliseconds / MILLISECONDS_PER_SECOND;
+        time_interval->milliseconds %= MILLISECONDS_PER_SECOND;
+    }
+
+    if (time_interval->seconds >= SECONDS_PER_MINUTE) {
+        time_interval->minutes += time_interval->seconds / SECONDS_PER_MINUTE;
+        time_interval->seconds %= SECONDS_PER_MINUTE;
+    }
+
+    if (time_interval->minutes >= MINUTES_PER_HOUR) {
+        time_interval->hours += time_interval->minutes / MINUTES_PER_HOUR;
+        time_interval->minutes %= MINUTES_PER_HOUR;
+    }
+
+    if (time_interval->hours >= HOURS_PER_DAY) {
+        time_interval->days += time_interval->hours / HOURS_PER_DAY;
+        time_interval->hours %= HOURS_PER_DAY;
+    }
+}
+
+/**
+ * @brief Create a TimeInterval object.
+ * @param days The days.
+ * @param hours The hours.
+ * @param minutes The minutes.
+ * @param seconds The seconds.
+ * @param milliseconds The milliseconds.
+ * @return Returns the TimeInterval object.
+ */
+TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds) {
+    TimeInterval time_interval;
+    time_interval.days = days;
+    time_interval.hours = hours;
+    time_interval.minutes = minutes;
+    time_interval.seconds = seconds;
+    time_interval.milliseconds = milliseconds;
+    __time_interval_normalize(&time_interval);
+    exit_if_fail(__is_valid_time_interval(time_interval));
+    return time_interval;
+}
+
+/**
+ * @brief Get the string representation of the time interval.
+ * @param time_interval The TimeInterval object.
+ * @return Returns the string representation of the time interval.
+ * @note The caller must free the returned string.
+ */
+char *time_interval_to_string(TimeInterval time_interval) {
+    char *time_interval_string = NULL;
+    exit_if_fail(__is_valid_time_interval(time_interval));
+
+    time_interval_string = (char *)malloc(sizeof(char) * 128);
+    return_value_if_fail(time_interval_string != NULL, NULL);
+
+    sprintf(time_interval_string, "%d day(s) %d hour(s) %d minute(s) %d second(s) %d millisecond(s)", time_interval.days, time_interval.hours, time_interval.minutes, time_interval.seconds, time_interval.milliseconds);
+    return time_interval_string;
+}
+
 /**
  * @brief Create a Date object.
  * @param year The year.
@@ -435,10 +539,10 @@ Time time_add(Time time, int milliseconds) {
 }
 
 /**
- * @brief Get the difference between two Time objects.
+ * @brief Get the milliseconds between two Time objects.
  * @param time1 The first Time object.
  * @param time2 The second Time object.
- * @return Returns the difference between two Time objects.
+ * @return Returns the milliseconds between two Time objects.
  */
 int time_diff(Time time1, Time time2) {
     int milliseconds1;
@@ -465,106 +569,6 @@ char *time_to_string(Time time) {
 
     sprintf(time_string, "%02d:%02d:%02d.%03d", time.hour, time.minute, time.second, time.millisecond);
     return time_string;
-}
-
-/**
- * @brief Determine whether the time interval is valid.
- * @param time_interval The TimeInterval object.
- * @return Returns true if the time interval is valid, otherwise returns false.
- */
-static bool __is_valid_time_interval(TimeInterval time_interval) {
-    if (time_interval.days < 0) {
-        fprintf(stderr, "Error: days must be greater than or equal to 0.\n");
-        return false;
-    }
-
-    if (time_interval.hours < 0 || time_interval.hours >= HOURS_PER_DAY) {
-        fprintf(stderr, "Error: hours must be 0 ~ 23.\n");
-        return false;
-    }
-
-    if (time_interval.minutes < 0 || time_interval.minutes >= MINUTES_PER_HOUR) {
-        fprintf(stderr, "Error: minutes must be 0 ~ 59.\n");
-        return false;
-    }
-
-    if (time_interval.seconds < 0 || time_interval.seconds >= SECONDS_PER_MINUTE) {
-        fprintf(stderr, "Error: seconds must be 0 ~ 59.\n");
-        return false;
-    }
-
-    if (time_interval.milliseconds < 0 || time_interval.milliseconds >= MILLISECONDS_PER_SECOND) {
-        fprintf(stderr, "Error: milliseconds must be 0 ~ 999.\n");
-        return false;
-    }
-
-    return true;
-}
-
-/**
- * @brief Normalize the time interval.
- * @param time_interval The TimeInterval object.
- */
-static void __time_interval_normalize(TimeInterval *time_interval) {
-    return_if_fail(time_interval != NULL);
-
-    if (time_interval->milliseconds >= MILLISECONDS_PER_SECOND) {
-        time_interval->seconds += time_interval->milliseconds / MILLISECONDS_PER_SECOND;
-        time_interval->milliseconds %= MILLISECONDS_PER_SECOND;
-    }
-
-    if (time_interval->seconds >= SECONDS_PER_MINUTE) {
-        time_interval->minutes += time_interval->seconds / SECONDS_PER_MINUTE;
-        time_interval->seconds %= SECONDS_PER_MINUTE;
-    }
-
-    if (time_interval->minutes >= MINUTES_PER_HOUR) {
-        time_interval->hours += time_interval->minutes / MINUTES_PER_HOUR;
-        time_interval->minutes %= MINUTES_PER_HOUR;
-    }
-
-    if (time_interval->hours >= HOURS_PER_DAY) {
-        time_interval->days += time_interval->hours / HOURS_PER_DAY;
-        time_interval->hours %= HOURS_PER_DAY;
-    }
-}
-
-/**
- * @brief Create a TimeInterval object.
- * @param days The days.
- * @param hours The hours.
- * @param minutes The minutes.
- * @param seconds The seconds.
- * @param milliseconds The milliseconds.
- * @return Returns the TimeInterval object.
- */
-TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds) {
-    TimeInterval time_interval;
-    time_interval.days = days;
-    time_interval.hours = hours;
-    time_interval.minutes = minutes;
-    time_interval.seconds = seconds;
-    time_interval.milliseconds = milliseconds;
-    exit_if_fail(__is_valid_time_interval(time_interval));
-    __time_interval_normalize(&time_interval);
-    return time_interval;
-}
-
-/**
- * @brief Get the string representation of the time interval.
- * @param time_interval The TimeInterval object.
- * @return Returns the string representation of the time interval.
- * @note The caller must free the returned string.
- */
-char *time_interval_to_string(TimeInterval time_interval) {
-    char *time_interval_string = NULL;
-    exit_if_fail(__is_valid_time_interval(time_interval));
-
-    time_interval_string = (char *)malloc(sizeof(char) * 128);
-    return_value_if_fail(time_interval_string != NULL, NULL);
-
-    sprintf(time_interval_string, "%d day(s) %d hour(s) %d minute(s) %d second(s) %d millisecond(s)", time_interval.days, time_interval.hours, time_interval.minutes, time_interval.seconds, time_interval.milliseconds);
-    return time_interval_string;
 }
 
 /**
@@ -712,8 +716,27 @@ DateTime datetime_add(DateTime datetime, int days, int milliseconds) {
  */
 TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2) {
     TimeInterval time_interval;
+    DateTime temp;
+    int days_diff = 0;
+    int milliseconds_diff = 0;
+
     exit_if_fail(__is_valid_datetime(datetime1) && __is_valid_datetime(datetime2));
 
+    if (datetime_compare(datetime1, datetime2) < 0) {
+        temp = datetime1;
+        datetime1 = datetime2;
+        datetime2 = temp;
+    }
+
+    days_diff = date_diff(datetime1.date, datetime2.date);
+    milliseconds_diff = time_diff(datetime1.time, datetime2.time);
+
+    if (milliseconds_diff < 0) {
+        days_diff--;
+        milliseconds_diff += MILLISECONDS_PER_DAY;
+    }
+
+    time_interval = time_interval_create(days_diff, 0, 0, 0, milliseconds_diff);
     return time_interval;
 }
 

@@ -17,6 +17,10 @@ typedef int bool;
 #define HOURS_PER_DAY 24
 #define DAYS_IN_WEEK 7
 #define MONTHS_PER_YEAR 12
+
+#define MILLISECONDS_PER_MINUTE (MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE)
+#define MILLISECONDS_PER_HOUR (MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR)
+#define MILLISECONDS_PER_DAY (MILLISECONDS_PER_HOUR * HOURS_PER_DAY)
 #define SECONDS_PER_HOUR (SECONDS_PER_MINUTE * MINUTES_PER_HOUR)
 #define SECONDS_PER_DAY (SECONDS_PER_HOUR * HOURS_PER_DAY)
 #define SECONDS_PER_WEEK (SECONDS_PER_DAY * DAYS_IN_WEEK)
@@ -54,6 +58,14 @@ typedef enum Day {
     SAT
 } Day;
 
+typedef struct TimeInterval {
+    int days;
+    int hours;
+    int minutes;
+    int seconds;
+    int milliseconds;
+} TimeInterval;
+
 typedef struct Date {
     int year;
     int month;
@@ -71,14 +83,6 @@ typedef struct DateTime {
     Date date;
     Time time;
 } DateTime;
-
-typedef struct TimeInterval {
-    int days;
-    int hours;
-    int minutes;
-    int seconds;
-    int milliseconds;
-} TimeInterval;
 
 /**
  * @brief Determine whether the year is a leap year.
@@ -119,6 +123,25 @@ int nth_day_of_year(int year, int month, int day);
  * @return Returns the n-th day of the week.
  */
 Day nth_day_of_week(int year, int month, int day);
+
+/**
+ * @brief Create a TimeInterval object.
+ * @param days The days.
+ * @param hours The hours.
+ * @param minutes The minutes.
+ * @param seconds The seconds.
+ * @param milliseconds The milliseconds.
+ * @return Returns the TimeInterval object.
+ */
+TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds);
+
+/**
+ * @brief Get the string representation of the time interval.
+ * @param time_interval The TimeInterval object.
+ * @return Returns the string representation of the time interval.
+ * @note The caller must free the returned string.
+ */
+char *time_interval_to_string(TimeInterval time_interval);
 
 /**
  * @brief Create a Date object.
@@ -204,10 +227,10 @@ int time_compare(Time time1, Time time2);
 Time time_add(Time time, int milliseconds);
 
 /**
- * @brief Get the difference between two Time objects.
+ * @brief Get the milliseconds between two Time objects.
  * @param time1 The first Time object.
  * @param time2 The second Time object.
- * @return Returns the difference between two Time objects.
+ * @return Returns the milliseconds between two Time objects.
  */
 int time_diff(Time time1, Time time2);
 
@@ -218,25 +241,6 @@ int time_diff(Time time1, Time time2);
  * @note The caller must free the returned string.
  */
 char *time_to_string(Time time);
-
-/**
- * @brief Create a TimeInterval object.
- * @param days The days.
- * @param hours The hours.
- * @param minutes The minutes.
- * @param seconds The seconds.
- * @param milliseconds The milliseconds.
- * @return Returns the TimeInterval object.
- */
-TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds);
-
-/**
- * @brief Get the string representation of the time interval.
- * @param time_interval The TimeInterval object.
- * @return Returns the string representation of the time interval.
- * @note The caller must free the returned string.
- */
-char *time_interval_to_string(TimeInterval time_interval);
 
 /**
  * @brief Create a DateTime object.

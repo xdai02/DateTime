@@ -97,6 +97,43 @@ void test_nth_day_of_week() {
     printf("[PASS] nth_day_of_week\n");
 }
 
+void test_time_interval_create() {
+    TimeInterval time_interval;
+
+    time_interval = time_interval_create(0, 0, 0, 0, 0);
+    assert(time_interval.days == 0);
+    assert(time_interval.hours == 0);
+    assert(time_interval.minutes == 0);
+    assert(time_interval.seconds == 0);
+    assert(time_interval.milliseconds == 0);
+
+    time_interval = time_interval_create(1, 2, 3, 4, 5);
+    assert(time_interval.days == 1);
+    assert(time_interval.hours == 2);
+    assert(time_interval.minutes == 3);
+    assert(time_interval.seconds == 4);
+    assert(time_interval.milliseconds == 5);
+
+    printf("[PASS] time_interval_create\n");
+}
+
+void test_time_interval_to_string() {
+    TimeInterval time_interval;
+    char *str;
+
+    time_interval = time_interval_create(0, 0, 0, 0, 0);
+    str = time_interval_to_string(time_interval);
+    assert(strcmp(str, "0 day(s) 0 hour(s) 0 minute(s) 0 second(s) 0 millisecond(s)") == 0);
+    free(str);
+
+    time_interval = time_interval_create(1, 2, 3, 4, 5);
+    str = time_interval_to_string(time_interval);
+    assert(strcmp(str, "1 day(s) 2 hour(s) 3 minute(s) 4 second(s) 5 millisecond(s)") == 0);
+    free(str);
+
+    printf("[PASS] time_interval_to_string\n");
+}
+
 void test_date_create() {
     Date date;
 
@@ -501,43 +538,6 @@ void test_time_to_string() {
     printf("[PASS] time_to_string\n");
 }
 
-void test_time_interval_create() {
-    TimeInterval time_interval;
-
-    time_interval = time_interval_create(0, 0, 0, 0, 0);
-    assert(time_interval.days == 0);
-    assert(time_interval.hours == 0);
-    assert(time_interval.minutes == 0);
-    assert(time_interval.seconds == 0);
-    assert(time_interval.milliseconds == 0);
-
-    time_interval = time_interval_create(1, 2, 3, 4, 5);
-    assert(time_interval.days == 1);
-    assert(time_interval.hours == 2);
-    assert(time_interval.minutes == 3);
-    assert(time_interval.seconds == 4);
-    assert(time_interval.milliseconds == 5);
-
-    printf("[PASS] time_interval_create\n");
-}
-
-void test_time_interval_to_string() {
-    TimeInterval time_interval;
-    char *str;
-
-    time_interval = time_interval_create(0, 0, 0, 0, 0);
-    str = time_interval_to_string(time_interval);
-    assert(strcmp(str, "0 day(s) 0 hour(s) 0 minute(s) 0 second(s) 0 millisecond(s)") == 0);
-    free(str);
-
-    time_interval = time_interval_create(1, 2, 3, 4, 5);
-    str = time_interval_to_string(time_interval);
-    assert(strcmp(str, "1 day(s) 2 hour(s) 3 minute(s) 4 second(s) 5 millisecond(s)") == 0);
-    free(str);
-
-    printf("[PASS] time_interval_to_string\n");
-}
-
 void test_datetime_create() {
     DateTime datetime;
 
@@ -671,11 +671,33 @@ void test_datetime_add() {
     assert(datetime.time.second == 59);
     assert(datetime.time.millisecond == 900);
 
-    printf("[TODO] datetime_add\n");
+    printf("[PASS] datetime_add\n");
 }
 
 void test_datetime_diff() {
-    printf("[TODO] datetime_diff\n");
+    TimeInterval time_interval;
+    DateTime datetime1;
+    DateTime datetime2;
+
+    datetime1 = datetime_create(2023, MAY, 30, 22, 57, 28, 0);
+    datetime2 = datetime_create(2023, MAY, 31, 22, 59, 29, 100);
+    time_interval = datetime_diff(datetime1, datetime2);
+    assert(time_interval.days == 1);
+    assert(time_interval.hours == 0);
+    assert(time_interval.minutes == 2);
+    assert(time_interval.seconds == 1);
+    assert(time_interval.milliseconds == 100);
+
+    datetime1 = datetime_create(2023, JUN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2023, MAY, 31, 23, 59, 59, 999);
+    time_interval = datetime_diff(datetime1, datetime2);
+    assert(time_interval.days == 0);
+    assert(time_interval.hours == 0);
+    assert(time_interval.minutes == 0);
+    assert(time_interval.seconds == 0);
+    assert(time_interval.milliseconds == 1);
+
+    printf("[PASS] datetime_diff\n");
 }
 
 void test_datetime_to_string() {
@@ -702,6 +724,9 @@ int main() {
     test_nth_day_of_year();
     test_nth_day_of_week();
 
+    test_time_interval_create();
+    test_time_interval_to_string();
+
     test_date_create();
     test_date_now();
     test_date_compare();
@@ -715,9 +740,6 @@ int main() {
     test_time_add();
     test_time_diff();
     test_time_to_string();
-
-    test_time_interval_create();
-    test_time_interval_to_string();
 
     test_datetime_create();
     test_datetime_now();
