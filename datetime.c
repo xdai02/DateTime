@@ -1,6 +1,7 @@
 #include "datetime.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #ifdef _WIN32
@@ -233,10 +234,10 @@ Date date_add(Date date, int days) {
 }
 
 /**
- * @brief Get the difference between two Date objects.
+ * @brief Get the the days between two Date objects.
  * @param date1 The first Date object.
  * @param date2 The second Date object.
- * @return Returns the difference between two Date objects.
+ * @return Returns the days between two Date objects.
  */
 int date_diff(Date date1, Date date2) {
     struct tm tm_date1 = {0};
@@ -259,6 +260,23 @@ int date_diff(Date date1, Date date2) {
     time2 = mktime(&tm_date2);
     diff_seconds = difftime(time1, time2);
     return (int)(diff_seconds / SECONDS_PER_DAY);
+}
+
+/**
+ * @brief Get the string representation (yyyy/mm/dd) of the date.
+ * @param date The Date object.
+ * @return Returns the string representation of the date.
+ * @note The caller must free the returned string.
+ */
+char *date_to_string(Date date) {
+    char *date_string = NULL;
+    exit_if_fail(__is_valid_date(date.year, date.month, date.day));
+
+    date_string = (char *)malloc(sizeof(char) * 11);
+    return_value_if_fail(date_string != NULL, NULL);
+
+    sprintf(date_string, "%04d/%02d/%02d", date.year, date.month, date.day);
+    return date_string;
 }
 
 /**
@@ -388,7 +406,7 @@ Time time_add(Time time, int milliseconds) {
 
     total_milliseconds = time.millisecond + milliseconds;
 
-    if(total_milliseconds < 0){
+    if (total_milliseconds < 0) {
         time.second += total_milliseconds / MILLISECONDS_PER_SECOND - 1;
         time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND + MILLISECONDS_PER_SECOND;
     } else {
@@ -396,7 +414,7 @@ Time time_add(Time time, int milliseconds) {
         time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND;
     }
 
-    if(time.second < 0){
+    if (time.second < 0) {
         time.minute += time.second / SECONDS_PER_MINUTE - 1;
         time.second = time.second % SECONDS_PER_MINUTE + SECONDS_PER_MINUTE;
     } else {
@@ -404,7 +422,7 @@ Time time_add(Time time, int milliseconds) {
         time.second = time.second % SECONDS_PER_MINUTE;
     }
 
-    if(time.minute < 0){
+    if (time.minute < 0) {
         time.hour += time.minute / MINUTES_PER_HOUR - 1;
         time.minute = time.minute % MINUTES_PER_HOUR + MINUTES_PER_HOUR;
     } else {
@@ -432,4 +450,128 @@ int time_diff(Time time1, Time time2) {
     milliseconds1 = (time1.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time1.minute * SECONDS_PER_MINUTE + time1.second) * MILLISECONDS_PER_SECOND + time1.millisecond;
     milliseconds2 = (time2.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time2.minute * SECONDS_PER_MINUTE + time2.second) * MILLISECONDS_PER_SECOND + time2.millisecond;
     return milliseconds1 - milliseconds2;
+}
+
+/**
+ * @brief Get the string representation (hh:mm:ss.fff) of the time.
+ * @param time The Time object.
+ * @return Returns the string representation of the time.
+ * @note The caller must free the returned string.
+ */
+char *time_to_string(Time time) {
+    char *time_string = NULL;
+    exit_if_fail(__is_valid_time(time.hour, time.minute, time.second, time.millisecond));
+
+    time_string = (char *)malloc(sizeof(char) * 13);
+    return_value_if_fail(time_string != NULL, NULL);
+
+    sprintf(time_string, "%02d:%02d:%02d.%03d", time.hour, time.minute, time.second, time.millisecond);
+    return time_string;
+}
+
+/**
+ * @brief Determine whether the datetime is valid.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @param hour The hour.
+ * @param minute The minute.
+ * @param second The second.
+ * @param millisecond The millisecond.
+ * @return Returns true if the datetime is valid, otherwise returns false.
+ */
+static bool __is_valid_datetime(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+    return __is_valid_date(year, month, day) && __is_valid_time(hour, minute, second, millisecond);
+}
+
+/**
+ * @brief Create a DateTime object.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @param hour The hour.
+ * @param minute The minute.
+ * @param second The second.
+ * @param millisecond The millisecond.
+ * @return Returns the Date object.
+ */
+DateTime datetime_create(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+    DateTime datetime;
+    exit_if_fail(__is_valid_datetime(year, month, day, hour, minute, second, millisecond));
+    datetime.date = date_create(year, month, day);
+    datetime.time = time_create(hour, minute, second, millisecond);
+    return datetime;
+}
+
+/**
+ * @brief Get the current datetime.
+ * @return Returns the DateTime object.
+ */
+DateTime datetime_now() {
+    DateTime datetime;
+    datetime.date = date_now();
+    datetime.time = time_now();
+    return datetime;
+}
+
+/**
+ * @brief Compare two DateTime objects.
+ * @param datetime1 The first DateTime object.
+ * @param datetime2 The second DateTime object.
+ * @return Returns 1 if datetime1 is greater than datetime2.
+ *         Returns -1 if datetime1 is less than datetime2.
+ *         Returns 0 if datetime1 is equal to datetime2.
+ */
+int datetime_compare(DateTime datetime1, DateTime datetime2) {
+    exit_if_fail(__is_valid_datetime(datetime1.date.year, datetime1.date.month, datetime1.date.day, datetime1.time.hour, datetime1.time.minute, datetime1.time.second, datetime1.time.millisecond));
+    exit_if_fail(__is_valid_datetime(datetime2.date.year, datetime2.date.month, datetime2.date.day, datetime2.time.hour, datetime2.time.minute, datetime2.time.second, datetime2.time.millisecond));
+
+    if (date_compare(datetime1.date, datetime2.date) > 0) {
+        return 1;
+    } else if (date_compare(datetime1.date, datetime2.date) < 0) {
+        return -1;
+    }
+
+    if (time_compare(datetime1.time, datetime2.time) > 0) {
+        return 1;
+    } else if (time_compare(datetime1.time, datetime2.time) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+#if 0
+DateTime datetime_add(DateTime datetime, int milliseconds) {
+}
+
+int datetime_diff(DateTime datetime1, DateTime datetime2) {
+}
+#endif
+
+/**
+ * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.
+ * @param datetime The DateTime object.
+ * @return Returns the string representation of the datetime.
+ * @note The caller must free the returned string.
+ */
+char *datetime_to_string(DateTime datetime) {
+    char *datetime_str = NULL;
+    char *date_str = NULL;
+    char *time_str = NULL;
+    exit_if_fail(__is_valid_datetime(datetime.date.year, datetime.date.month, datetime.date.day, datetime.time.hour, datetime.time.minute, datetime.time.second, datetime.time.millisecond));
+
+    date_str = date_to_string(datetime.date);
+    time_str = time_to_string(datetime.time);
+    datetime_str = (char *)malloc(sizeof(char) * (strlen(date_str) + strlen(time_str) + 1));
+    if (datetime_str == NULL) {
+        free(date_str);
+        free(time_str);
+        return NULL;
+    }
+
+    sprintf(datetime_str, "%s %s", date_str, time_str);
+    free(date_str);
+    free(time_str);
+    return datetime_str;
 }

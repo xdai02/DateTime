@@ -1,19 +1,35 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# Define time format
-fmt = "%H:%M:%S.%f"
+def calculate_datetime_difference(datetime1, datetime2):
+    format = "%Y/%m/%d %H:%M:%S.%f"
+    dt1 = datetime.strptime(datetime1, format)
+    dt2 = datetime.strptime(datetime2, format)
 
-# Store the times
-time_str1 = "17:35:23.643"
-time_obj1 = datetime.strptime(time_str1, fmt)
+    if dt1 > dt2:
+        difference = dt1 - dt2
+        negative = True
+    else:
+        difference = dt2 - dt1
+        negative = False
 
-time_str2 = "7:53:32.346"
-time_obj2 = datetime.strptime(time_str2, fmt)
+    days = difference.days
+    total_seconds = difference.total_seconds()
+    milliseconds = int(difference.total_seconds() * 1000 % 1000)
 
-# Calculate the difference
-delta = time_obj1 - time_obj2
+    if negative:
+        days = -days
+        milliseconds = -milliseconds
 
-# Get the difference in milliseconds
-diff_ms = delta.total_seconds() * 1000
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    hours %= 24
 
-print(f"Difference in milliseconds: {diff_ms}")
+    return days, int(hours), int(minutes), int(seconds), milliseconds
+
+datetime1 = "2023/05/29 00:00:00.000"
+datetime2 = "2023/05/28 00:00:00.001"
+
+days, hours, minutes, seconds, milliseconds = calculate_datetime_difference(datetime1, datetime2)
+output = f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds, {milliseconds} milliseconds"
+
+print(f"Difference: {output}")

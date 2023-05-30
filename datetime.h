@@ -146,12 +146,20 @@ int date_compare(Date date1, Date date2);
 Date date_add(Date date, int days);
 
 /**
- * @brief Get the difference between two Date objects.
+ * @brief Get the the days between two Date objects.
  * @param date1 The first Date object.
  * @param date2 The second Date object.
- * @return Returns the difference between two Date objects.
+ * @return Returns the days between two Date objects.
  */
 int date_diff(Date date1, Date date2);
+
+/**
+ * @brief Get the string representation (yyyy/mm/dd) of the date.
+ * @param date The Date object.
+ * @return Returns the string representation of the date.
+ * @note The caller must free the returned string.
+ */
+char *date_to_string(Date date);
 
 /**
  * @brief Create a Time object.
@@ -194,5 +202,54 @@ Time time_add(Time time, int milliseconds);
  * @return Returns the difference between two Time objects.
  */
 int time_diff(Time time1, Time time2);
+
+/**
+ * @brief Get the string representation (hh:mm:ss.fff) of the time.
+ * @param time The Time object.
+ * @return Returns the string representation of the time.
+ * @note The caller must free the returned string.
+ */
+char *time_to_string(Time time);
+
+/**
+ * @brief Create a DateTime object.
+ * @param year The year.
+ * @param month The month.
+ * @param day The day.
+ * @param hour The hour.
+ * @param minute The minute.
+ * @param second The second.
+ * @param millisecond The millisecond.
+ * @return Returns the Date object.
+ */
+DateTime datetime_create(int year, int month, int day, int hour, int minute, int second, int millisecond);
+
+/**
+ * @brief Get the current datetime.
+ * @return Returns the DateTime object.
+ */
+DateTime datetime_now();
+
+/**
+ * @brief Compare two DateTime objects.
+ * @param datetime1 The first DateTime object.
+ * @param datetime2 The second DateTime object.
+ * @return Returns 1 if datetime1 is greater than datetime2.
+ *         Returns -1 if datetime1 is less than datetime2.
+ *         Returns 0 if datetime1 is equal to datetime2.
+ */
+int datetime_compare(DateTime datetime1, DateTime datetime2);
+
+DateTime datetime_add(DateTime datetime, int milliseconds);
+
+int datetime_diff(DateTime datetime1, DateTime datetime2);
+
+/**
+ * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.
+ * @param datetime The DateTime object.
+ * @return Returns the string representation of the datetime.
+ * @note The caller must free the returned string.
+ */
+char *datetime_to_string(DateTime datetime);
 
 #endif

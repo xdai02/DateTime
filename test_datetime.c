@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <assert.h>
 #include "datetime.h"
@@ -274,6 +275,33 @@ void test_date_diff() {
     printf("[PASS] date_diff\n");
 }
 
+void test_date_to_string() {
+    Date date;
+    char *str;
+
+    date = date_create(2000, JAN, 1);
+    str = date_to_string(date);
+    assert(strcmp(str, "2000/01/01") == 0);
+    free(str);
+
+    date = date_create(2000, FEB, 29);
+    str = date_to_string(date);
+    assert(strcmp(str, "2000/02/29") == 0);
+    free(str);
+
+    date = date_create(2023, MAY, 17);
+    str = date_to_string(date);
+    assert(strcmp(str, "2023/05/17") == 0);
+    free(str);
+
+    date = date_create(2024, DEC, 4);
+    str = date_to_string(date);
+    assert(strcmp(str, "2024/12/04") == 0);
+    free(str);
+
+    printf("[PASS] date_to_string\n");
+}
+
 void test_time_create() {
     Time time;
 
@@ -436,6 +464,43 @@ void test_time_diff() {
     printf("[PASS] time_diff\n");
 }
 
+void test_time_to_string() {
+    Time time;
+    char *str;
+
+    time = time_create(0, 0, 0, 0);
+    str = time_to_string(time);
+    assert(strcmp(str, "00:00:00.000") == 0);
+    free(str);
+
+    time = time_create(23, 59, 59, 999);
+    str = time_to_string(time);
+    assert(strcmp(str, "23:59:59.999") == 0);
+    free(str);
+
+    time = time_create(12, 0, 0, 0);
+    str = time_to_string(time);
+    assert(strcmp(str, "12:00:00.000") == 0);
+    free(str);
+
+    time = time_create(12, 30, 0, 0);
+    str = time_to_string(time);
+    assert(strcmp(str, "12:30:00.000") == 0);
+    free(str);
+
+    time = time_create(12, 30, 17, 0);
+    str = time_to_string(time);
+    assert(strcmp(str, "12:30:17.000") == 0);
+    free(str);
+
+    time = time_create(12, 30, 17, 123);
+    str = time_to_string(time);
+    assert(strcmp(str, "12:30:17.123") == 0);
+    free(str);
+
+    printf("[PASS] time_to_string\n");
+}
+
 int main() {
     test_is_leap_year();
     test_days_in_month();
@@ -448,12 +513,14 @@ int main() {
     test_date_compare();
     test_date_add();
     test_date_diff();
+    test_date_to_string();
 
     test_time_create();
     test_time_now();
     test_time_compare();
     test_time_add();
     test_time_diff();
+    test_time_to_string();
 
     printf("[PASS] All\n");
     return 0;
