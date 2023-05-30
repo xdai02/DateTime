@@ -130,14 +130,26 @@ void test_date_now() {
 }
 
 void test_date_compare() {
-#if 0
-    Date date1 = date_create(2023, JAN, 1);
-    Date date2 = date_create(2000, DEC, 31);
+    Date date1;
+    Date date2;
+
+    date1 = date_create(2023, JAN, 1);
+    date2 = date_create(2023, JAN, 1);
+    assert(date_compare(date1, date2) == 0);
+
+    date1 = date_create(2023, JAN, 1);
+    date2 = date_create(2023, JAN, 2);
+    assert(date_compare(date1, date2) < 0);
+
+    date1 = date_create(2023, FEB, 5);
+    date2 = date_create(2023, JAN, 2);
     assert(date_compare(date1, date2) > 0);
-    assert(date_compare(date2, date1) < 0);
-    assert(date_compare(date1, date1) == 0);
-#endif
-    printf("[TODO] date_compare\n");
+
+    date1 = date_create(2023, FEB, 5);
+    date2 = date_create(2024, FEB, 5);
+    assert(date_compare(date1, date2) < 0);
+
+    printf("[PASS] date_compare\n");
 }
 
 void test_date_add() {
@@ -296,94 +308,132 @@ void test_time_now() {
 }
 
 void test_time_compare() {
-#if 0
-    Time time1 = time_create(7, 30, 0, 0);
-    Time time2 = time_create(16, 0, 0, 0);
+    Time time1;
+    Time time2;
+
+    time1 = time_create(7, 30, 23, 567);
+    time2 = time_create(7, 30, 23, 567);
+    assert(time_compare(time1, time2) == 0);
+
+    time1 = time_create(7, 30, 0, 0);
+    time2 = time_create(7, 30, 0, 1);
     assert(time_compare(time1, time2) < 0);
-    assert(time_compare(time2, time1) > 0);
-    assert(time_compare(time1, time1) == 0);
-#endif
-    printf("[TODO] time_compare\n");
+
+    time1 = time_create(7, 30, 5, 0);
+    time2 = time_create(7, 30, 2, 1);
+    assert(time_compare(time1, time2) > 0);
+
+    time1 = time_create(7, 32, 0, 0);
+    time2 = time_create(7, 30, 12, 677);
+    assert(time_compare(time1, time2) > 0);
+
+    time1 = time_create(17, 30, 0, 0);
+    time2 = time_create(7, 30, 0, 0);
+    assert(time_compare(time1, time2) > 0);
+
+    printf("[PASS] time_compare\n");
 }
 
 void test_time_add() {
-#if 0
     Time time;
     Time new_time;
 
-    time = time_create(0, 0, 0);
+    time = time_create(0, 0, 0, 0);
     new_time = time_add(time, 0);
     assert(new_time.hour == 0);
     assert(new_time.minute == 0);
     assert(new_time.second == 0);
+    assert(new_time.millisecond == 0);
 
-    time = time_create(0, 0, 0);
-    new_time = time_add(time, 1);
-    assert(new_time.hour == 0);
-    assert(new_time.minute == 0);
-    assert(new_time.second == 1);
-
-    time = time_create(23, 59, 59);
+    time = time_create(0, 0, 0, 0);
     new_time = time_add(time, 1);
     assert(new_time.hour == 0);
     assert(new_time.minute == 0);
     assert(new_time.second == 0);
+    assert(new_time.millisecond == 1);
 
-    time = time_create(11, 30, 0);
+    time = time_create(23, 59, 59, 999);
+    new_time = time_add(time, 1);
+    assert(new_time.hour == 0);
+    assert(new_time.minute == 0);
+    assert(new_time.second == 0);
+    assert(new_time.millisecond == 0);
+
+    time = time_create(11, 30, 0, 0);
     new_time = time_add(time, 3601);
-    assert(new_time.hour == 12);
+    assert(new_time.hour == 11);
     assert(new_time.minute == 30);
-    assert(new_time.second == 1);
+    assert(new_time.second == 3);
+    assert(new_time.millisecond == 601);
 
-    time = time_create(0, 0, 0);
+    time = time_create(17, 35, 23, 643);
+    new_time = time_add(time, 100000);
+    assert(new_time.hour == 17);
+    assert(new_time.minute == 37);
+    assert(new_time.second == 3);
+    assert(new_time.millisecond == 643);
+
+    time = time_create(0, 0, 0, 0);
     new_time = time_add(time, -1);
     assert(new_time.hour == 23);
     assert(new_time.minute == 59);
     assert(new_time.second == 59);
+    assert(new_time.millisecond == 999);
 
-    time = time_create(11, 30, 0);
+    time = time_create(11, 30, 0, 0);
     new_time = time_add(time, -3601);
-    assert(new_time.hour == 10);
+    assert(new_time.hour == 11);
     assert(new_time.minute == 29);
-    assert(new_time.second == 59);
-#endif
-    printf("[TOOD] time_add\n");
+    assert(new_time.second == 56);
+    assert(new_time.millisecond == 399);
+
+    time = time_create(17, 35, 23, 643);
+    new_time = time_add(time, -100000);
+    assert(new_time.hour == 17);
+    assert(new_time.minute == 33);
+    assert(new_time.second == 43);
+    assert(new_time.millisecond == 643);
+
+    printf("[PASS] time_add\n");
 }
 
 void test_time_diff() {
-#if 0
     Time time1;
     Time time2;
 
-    time1 = time_create(0, 0, 0);
-    time2 = time_create(0, 0, 0);
+    time1 = time_create(0, 0, 0, 0);
+    time2 = time_create(0, 0, 0, 0);
     assert(time_diff(time1, time2) == 0);
 
-    time1 = time_create(23, 59, 59);
-    time2 = time_create(0, 0, 0);
-    assert(time_diff(time1, time2) == 86399);
+    time1 = time_create(23, 59, 59, 999);
+    time2 = time_create(0, 0, 0, 0);
+    assert(time_diff(time1, time2) == 86399999);
 
-    time1 = time_create(12, 0, 0);
-    time2 = time_create(12, 0, 0);
+    time1 = time_create(12, 0, 0, 0);
+    time2 = time_create(12, 0, 0, 0);
     assert(time_diff(time1, time2) == 0);
 
-    time1 = time_create(12, 0, 0);
-    time2 = time_create(13, 0, 0);
-    assert(time_diff(time1, time2) == -3600);
+    time1 = time_create(12, 0, 0, 0);
+    time2 = time_create(13, 0, 0, 0);
+    assert(time_diff(time1, time2) == -3600000);
 
-    time1 = time_create(12, 0, 0);
-    time2 = time_create(11, 0, 0);
-    assert(time_diff(time1, time2) == 3600);
+    time1 = time_create(12, 0, 0, 0);
+    time2 = time_create(11, 0, 0, 0);
+    assert(time_diff(time1, time2) == 3600000);
 
-    time1 = time_create(12, 0, 0);
-    time2 = time_create(12, 30, 0);
-    assert(time_diff(time1, time2) == -1800);
+    time1 = time_create(12, 0, 0, 0);
+    time2 = time_create(12, 30, 0, 0);
+    assert(time_diff(time1, time2) == -1800000);
 
-    time1 = time_create(12, 30, 0);
-    time2 = time_create(12, 0, 0);
-    assert(time_diff(time1, time2) == 1800);
-#endif
-    printf("[TODO] time_diff\n");
+    time1 = time_create(12, 30, 0, 0);
+    time2 = time_create(12, 0, 0, 0);
+    assert(time_diff(time1, time2) == 1800000);
+
+    time1 = time_create(17, 35, 23, 643);
+    time2 = time_create(7, 53, 32, 346);
+    assert(time_diff(time1, time2) == 34911297);
+
+    printf("[PASS] time_diff\n");
 }
 
 int main() {

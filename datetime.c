@@ -388,16 +388,31 @@ Time time_add(Time time, int milliseconds) {
 
     total_milliseconds = time.millisecond + milliseconds;
 
-    time.second += total_milliseconds / MILLISECONDS_PER_SECOND;
-    time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND;
+    if(total_milliseconds < 0){
+        time.second += total_milliseconds / MILLISECONDS_PER_SECOND - 1;
+        time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND + MILLISECONDS_PER_SECOND;
+    } else {
+        time.second += total_milliseconds / MILLISECONDS_PER_SECOND;
+        time.millisecond = total_milliseconds % MILLISECONDS_PER_SECOND;
+    }
 
-    time.minute += time.second / SECONDS_PER_MINUTE;
-    time.second = time.second % SECONDS_PER_MINUTE;
+    if(time.second < 0){
+        time.minute += time.second / SECONDS_PER_MINUTE - 1;
+        time.second = time.second % SECONDS_PER_MINUTE + SECONDS_PER_MINUTE;
+    } else {
+        time.minute += time.second / SECONDS_PER_MINUTE;
+        time.second = time.second % SECONDS_PER_MINUTE;
+    }
 
-    time.hour += time.minute / MINUTES_PER_HOUR;
-    time.minute = time.minute % MINUTES_PER_HOUR;
+    if(time.minute < 0){
+        time.hour += time.minute / MINUTES_PER_HOUR - 1;
+        time.minute = time.minute % MINUTES_PER_HOUR + MINUTES_PER_HOUR;
+    } else {
+        time.hour += time.minute / MINUTES_PER_HOUR;
+        time.minute = time.minute % MINUTES_PER_HOUR;
+    }
 
-    time.hour = time.hour % HOURS_PER_DAY;
+    time.hour = (time.hour + HOURS_PER_DAY) % HOURS_PER_DAY;
     return time;
 }
 
