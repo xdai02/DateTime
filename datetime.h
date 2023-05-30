@@ -267,9 +267,22 @@ DateTime datetime_now();
  */
 int datetime_compare(DateTime datetime1, DateTime datetime2);
 
+/**
+ * @brief Add days and milliseconds to the datetime.
+ * @param datetime The DateTime object.
+ * @param days The number of days to add/subtract.
+ * @param milliseconds The number of milliseconds to add/subtract.
+ * @return DateTime The new DateTime object.
+ */
 DateTime datetime_add(DateTime datetime, int days, int milliseconds);
 
-int datetime_diff(DateTime datetime1, DateTime datetime2);
+/**
+ * @brief Get the difference between two DateTime objects.
+ * @param datetime1 The first DateTime object.
+ * @param datetime2 The second DateTime object.
+ * @return TimeInterval The difference between two DateTime objects.
+ */
+TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2);
 
 /**
  * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.

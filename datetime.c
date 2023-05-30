@@ -632,18 +632,90 @@ int datetime_compare(DateTime datetime1, DateTime datetime2) {
     return 0;
 }
 
+/**
+ * @brief Add days and milliseconds to the datetime.
+ * @param datetime The DateTime object.
+ * @param days The number of days to add/subtract.
+ * @param milliseconds The number of milliseconds to add/subtract.
+ * @return DateTime The new DateTime object.
+ */
 DateTime datetime_add(DateTime datetime, int days, int milliseconds) {
+    TimeInterval time_interval;
     exit_if_fail(__is_valid_datetime(datetime));
 
     datetime.date = date_add(datetime.date, days);
 
-    
+    if (milliseconds >= 0) {
+        time_interval = time_interval_create(0, 0, 0, 0, milliseconds);
+        datetime.date = date_add(datetime.date, time_interval.days);
+
+        datetime.time.millisecond += time_interval.milliseconds;
+        if (datetime.time.millisecond >= MILLISECONDS_PER_SECOND) {
+            datetime.time.second++;
+            datetime.time.millisecond %= MILLISECONDS_PER_SECOND;
+        }
+
+        datetime.time.second += time_interval.seconds;
+        if (datetime.time.second >= SECONDS_PER_MINUTE) {
+            datetime.time.minute++;
+            datetime.time.second %= SECONDS_PER_MINUTE;
+        }
+
+        datetime.time.minute += time_interval.minutes;
+        if (datetime.time.minute >= MINUTES_PER_HOUR) {
+            datetime.time.hour++;
+            datetime.time.minute %= MINUTES_PER_HOUR;
+        }
+
+        datetime.time.hour += time_interval.hours;
+        if (datetime.time.hour >= HOURS_PER_DAY) {
+            datetime.date = date_add(datetime.date, 1);
+            datetime.time.hour %= HOURS_PER_DAY;
+        }
+    } else {
+        time_interval = time_interval_create(0, 0, 0, 0, -milliseconds);
+        datetime.date = date_add(datetime.date, -time_interval.days);
+
+        datetime.time.millisecond -= time_interval.milliseconds;
+        if (datetime.time.millisecond < 0) {
+            datetime.time.second--;
+            datetime.time.millisecond += MILLISECONDS_PER_SECOND;
+        }
+
+        datetime.time.second -= time_interval.seconds;
+        if (datetime.time.second < 0) {
+            datetime.time.minute--;
+            datetime.time.second += SECONDS_PER_MINUTE;
+        }
+
+        datetime.time.minute -= time_interval.minutes;
+        if (datetime.time.minute < 0) {
+            datetime.time.hour--;
+            datetime.time.minute += MINUTES_PER_HOUR;
+        }
+
+        datetime.time.hour -= time_interval.hours;
+        if (datetime.time.hour < 0) {
+            datetime.date = date_add(datetime.date, -1);
+            datetime.time.hour += HOURS_PER_DAY;
+        }
+    }
+
+    return datetime;
 }
 
-#if 0
-int datetime_diff(DateTime datetime1, DateTime datetime2) {
+/**
+ * @brief Get the difference between two DateTime objects.
+ * @param datetime1 The first DateTime object.
+ * @param datetime2 The second DateTime object.
+ * @return TimeInterval The difference between two DateTime objects.
+ */
+TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2) {
+    TimeInterval time_interval;
+    exit_if_fail(__is_valid_datetime(datetime1) && __is_valid_datetime(datetime2));
+
+    return time_interval;
 }
-#endif
 
 /**
  * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.

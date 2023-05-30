@@ -619,6 +619,58 @@ void test_datetime_compare() {
 }
 
 void test_datetime_add() {
+    DateTime datetime;
+
+    datetime = datetime_create(2023, MAY, 29, 14, 40, 1, 0);
+    datetime = datetime_add(datetime, 3, 100);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == JUN);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 14);
+    assert(datetime.time.minute == 40);
+    assert(datetime.time.second == 1);
+    assert(datetime.time.millisecond == 100);
+
+    datetime = datetime_create(2023, MAY, 29, 23, 59, 59, 900);
+    datetime = datetime_add(datetime, 0, 100);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 30);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_create(2023, MAY, 29, 14, 40, 1, 0);
+    datetime = datetime_add(datetime, -2, 100);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 27);
+    assert(datetime.time.hour == 14);
+    assert(datetime.time.minute == 40);
+    assert(datetime.time.second == 1);
+    assert(datetime.time.millisecond == 100);
+
+    datetime = datetime_create(2023, MAY, 29, 14, 40, 1, 0);
+    datetime = datetime_add(datetime, -2, -100);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 27);
+    assert(datetime.time.hour == 14);
+    assert(datetime.time.minute == 40);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 900);
+
+    datetime = datetime_create(2023, MAY, 29, 0, 0, 0, 0);
+    datetime = datetime_add(datetime, 0, -100);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 28);
+    assert(datetime.time.hour == 23);
+    assert(datetime.time.minute == 59);
+    assert(datetime.time.second == 59);
+    assert(datetime.time.millisecond == 900);
+
     printf("[TODO] datetime_add\n");
 }
 
