@@ -501,6 +501,148 @@ void test_time_to_string() {
     printf("[PASS] time_to_string\n");
 }
 
+void test_time_interval_create() {
+    TimeInterval time_interval;
+
+    time_interval = time_interval_create(0, 0, 0, 0, 0);
+    assert(time_interval.days == 0);
+    assert(time_interval.hours == 0);
+    assert(time_interval.minutes == 0);
+    assert(time_interval.seconds == 0);
+    assert(time_interval.milliseconds == 0);
+
+    time_interval = time_interval_create(1, 2, 3, 4, 5);
+    assert(time_interval.days == 1);
+    assert(time_interval.hours == 2);
+    assert(time_interval.minutes == 3);
+    assert(time_interval.seconds == 4);
+    assert(time_interval.milliseconds == 5);
+
+    printf("[PASS] time_interval_create\n");
+}
+
+void test_time_interval_to_string() {
+    TimeInterval time_interval;
+    char *str;
+
+    time_interval = time_interval_create(0, 0, 0, 0, 0);
+    str = time_interval_to_string(time_interval);
+    assert(strcmp(str, "0 day(s) 0 hour(s) 0 minute(s) 0 second(s) 0 millisecond(s)") == 0);
+    free(str);
+
+    time_interval = time_interval_create(1, 2, 3, 4, 5);
+    str = time_interval_to_string(time_interval);
+    assert(strcmp(str, "1 day(s) 2 hour(s) 3 minute(s) 4 second(s) 5 millisecond(s)") == 0);
+    free(str);
+
+    printf("[PASS] time_interval_to_string\n");
+}
+
+void test_datetime_create() {
+    DateTime datetime;
+
+    datetime = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    assert(datetime.date.year == 2000);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_create(2023, MAY, 29, 23, 59, 59, 999);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 29);
+    assert(datetime.time.hour == 23);
+    assert(datetime.time.minute == 59);
+    assert(datetime.time.second == 59);
+    assert(datetime.time.millisecond == 999);
+
+    printf("[PASS] datetime_create\n");
+}
+
+void test_datetime_now() {
+    const int DELAY = 2;
+    DateTime datetime = datetime_now();
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    assert(datetime.date.year == tm.tm_year + 1900);
+    assert(datetime.date.month == tm.tm_mon + 1);
+    assert(datetime.date.day == tm.tm_mday);
+    assert(datetime.time.hour == tm.tm_hour);
+    assert(datetime.time.minute == tm.tm_min);
+    assert(datetime.time.second <= tm.tm_sec + DELAY);
+    assert(datetime.time.millisecond < MILLISECONDS_PER_SECOND);
+
+    printf("[PASS] datetime_now\n");
+}
+
+void test_datetime_compare() {
+    DateTime datetime1;
+    DateTime datetime2;
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) == 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 1, 0, 0, 0, 1);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 1, 0, 0, 1, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 1, 0, 1, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 1, 1, 0, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, JAN, 2, 0, 0, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2000, FEB, 1, 0, 0, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    datetime1 = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    datetime2 = datetime_create(2001, JAN, 1, 0, 0, 0, 0);
+    assert(datetime_compare(datetime1, datetime2) < 0);
+
+    printf("[PASS] datetime_compare\n");
+}
+
+void test_datetime_add() {
+    printf("[TODO] datetime_add\n");
+}
+
+void test_datetime_diff() {
+    printf("[TODO] datetime_diff\n");
+}
+
+void test_datetime_to_string() {
+    DateTime datetime;
+    char *str;
+
+    datetime = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    str = datetime_to_string(datetime);
+    assert(strcmp(str, "2000/01/01 00:00:00.000") == 0);
+    free(str);
+
+    datetime = datetime_create(2000, JAN, 1, 23, 59, 59, 999);
+    str = datetime_to_string(datetime);
+    assert(strcmp(str, "2000/01/01 23:59:59.999") == 0);
+    free(str);
+
+    printf("[PASS] datetime_to_string\n");
+}
+
 int main() {
     test_is_leap_year();
     test_days_in_month();
@@ -521,6 +663,16 @@ int main() {
     test_time_add();
     test_time_diff();
     test_time_to_string();
+
+    test_time_interval_create();
+    test_time_interval_to_string();
+
+    test_datetime_create();
+    test_datetime_now();
+    test_datetime_compare();
+    test_datetime_add();
+    test_datetime_diff();
+    test_datetime_to_string();
 
     printf("[PASS] All\n");
     return 0;

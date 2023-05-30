@@ -92,24 +92,22 @@ int days_in_year(int year) {
 
 /**
  * @brief Determine whether the date is valid.
- * @param year The year.
- * @param month The month.
- * @param day The day.
+ * @param date The Date object.
  * @return Returns true if the date is valid, otherwise returns false.
  */
-static bool __is_valid_date(int year, int month, int day) {
-    if (year < MIN_YEAR || year > MAX_YEAR) {
+static bool __is_valid_date(Date date) {
+    if (date.year < MIN_YEAR || date.year > MAX_YEAR) {
         fprintf(stderr, "Error: year must be %d ~ %d.\n", MIN_YEAR, MAX_YEAR);
         return false;
     }
 
-    if (month < JAN || month > DEC) {
+    if (date.month < JAN || date.month > DEC) {
         fprintf(stderr, "Error: month must be 1 ~ 12.\n");
         return false;
     }
 
-    if (day < 1 || day > days_in_month(year, month)) {
-        fprintf(stderr, "Error: only %d days in %d/%d.\n", days_in_month(year, month), year, month);
+    if (date.day < 1 || date.day > days_in_month(date.year, date.month)) {
+        fprintf(stderr, "Error: only %d days in %d/%d.\n", days_in_month(date.year, date.month), date.year, date.month);
         return false;
     }
 
@@ -124,10 +122,14 @@ static bool __is_valid_date(int year, int month, int day) {
  * @return Returns the n-th day of the year.
  */
 int nth_day_of_year(int year, int month, int day) {
+    Date date;
     int i = 0;
     int days = 0;
 
-    exit_if_fail(__is_valid_date(year, month, day));
+    date.year = year;
+    date.month = month;
+    date.day = day;
+    exit_if_fail(__is_valid_date(date));
 
     for (i = 1; i < month; i++) {
         days += days_in_month(year, i);
@@ -143,9 +145,13 @@ int nth_day_of_year(int year, int month, int day) {
  * @return Returns the n-th day of the week.
  */
 Day nth_day_of_week(int year, int month, int day) {
+    Date date;
     int h;
 
-    exit_if_fail(__is_valid_date(year, month, day));
+    date.year = year;
+    date.month = month;
+    date.day = day;
+    exit_if_fail(__is_valid_date(date));
 
     if (month < 3) {
         month += 12;
@@ -165,10 +171,10 @@ Day nth_day_of_week(int year, int month, int day) {
  */
 Date date_create(int year, int month, int day) {
     Date date;
-    exit_if_fail(__is_valid_date(year, month, day));
     date.year = year;
     date.month = month;
     date.day = day;
+    exit_if_fail(__is_valid_date(date));
     return date;
 }
 
@@ -191,8 +197,7 @@ Date date_now() {
  *         Returns 0 if date1 is equal to date2.
  */
 int date_compare(Date date1, Date date2) {
-    exit_if_fail(__is_valid_date(date1.year, date1.month, date1.day));
-    exit_if_fail(__is_valid_date(date2.year, date2.month, date2.day));
+    exit_if_fail(__is_valid_date(date1) && __is_valid_date(date2));
 
     if (date1.year > date2.year) {
         return 1;
@@ -223,7 +228,7 @@ int date_compare(Date date1, Date date2) {
  */
 Date date_add(Date date, int days) {
     struct tm tm_date = {0};
-    exit_if_fail(__is_valid_date(date.year, date.month, date.day));
+    exit_if_fail(__is_valid_date(date));
 
     tm_date.tm_year = date.year - 1900;
     tm_date.tm_mon = date.month - 1;
@@ -246,8 +251,7 @@ int date_diff(Date date1, Date date2) {
     time_t time2;
     double diff_seconds = 0;
 
-    exit_if_fail(__is_valid_date(date1.year, date1.month, date1.day));
-    exit_if_fail(__is_valid_date(date2.year, date2.month, date2.day));
+    exit_if_fail(__is_valid_date(date1) && __is_valid_date(date2));
 
     tm_date1.tm_year = date1.year - 1900;
     tm_date1.tm_mon = date1.month - 1;
@@ -270,7 +274,7 @@ int date_diff(Date date1, Date date2) {
  */
 char *date_to_string(Date date) {
     char *date_string = NULL;
-    exit_if_fail(__is_valid_date(date.year, date.month, date.day));
+    exit_if_fail(__is_valid_date(date));
 
     date_string = (char *)malloc(sizeof(char) * 11);
     return_value_if_fail(date_string != NULL, NULL);
@@ -281,29 +285,26 @@ char *date_to_string(Date date) {
 
 /**
  * @brief Determine whether the time is valid.
- * @param hour The hour.
- * @param minute The minute.
- * @param second The second.
- * @param millisecond The millisecond.
+ * @param time The Time object.
  * @return Returns true if the time is valid, otherwise returns false.
  */
-static bool __is_valid_time(int hour, int minute, int second, int millisecond) {
-    if (hour < 0 || hour >= HOURS_PER_DAY) {
+static bool __is_valid_time(Time time) {
+    if (time.hour < 0 || time.hour >= HOURS_PER_DAY) {
         fprintf(stderr, "Error: hour must be 0 ~ 23.\n");
         return false;
     }
 
-    if (minute < 0 || minute >= MINUTES_PER_HOUR) {
+    if (time.minute < 0 || time.minute >= MINUTES_PER_HOUR) {
         fprintf(stderr, "Error: minute must be 0 ~ 59.\n");
         return false;
     }
 
-    if (second < 0 || second >= SECONDS_PER_MINUTE) {
+    if (time.second < 0 || time.second >= SECONDS_PER_MINUTE) {
         fprintf(stderr, "Error: second must be 0 ~ 59.\n");
         return false;
     }
 
-    if (millisecond < 0 || millisecond >= MILLISECONDS_PER_SECOND) {
+    if (time.millisecond < 0 || time.millisecond >= MILLISECONDS_PER_SECOND) {
         fprintf(stderr, "Error: millisecond must be 0 ~ 999.\n");
         return false;
     }
@@ -321,11 +322,11 @@ static bool __is_valid_time(int hour, int minute, int second, int millisecond) {
  */
 Time time_create(int hour, int minute, int second, int millisecond) {
     Time time;
-    exit_if_fail(__is_valid_time(hour, minute, second, millisecond));
     time.hour = hour;
     time.minute = minute;
     time.second = second;
     time.millisecond = millisecond;
+    exit_if_fail(__is_valid_time(time));
     return time;
 }
 
@@ -364,8 +365,7 @@ Time time_now() {
  *         Returns 0 if time1 is equal to time2.
  */
 int time_compare(Time time1, Time time2) {
-    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second, time1.millisecond));
-    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second, time2.millisecond));
+    exit_if_fail(__is_valid_time(time1) && __is_valid_time(time2));
 
     if (time1.hour > time2.hour) {
         return 1;
@@ -402,7 +402,7 @@ int time_compare(Time time1, Time time2) {
  */
 Time time_add(Time time, int milliseconds) {
     int total_milliseconds = 0;
-    exit_if_fail(__is_valid_time(time.hour, time.minute, time.second, time.millisecond));
+    exit_if_fail(__is_valid_time(time));
 
     total_milliseconds = time.millisecond + milliseconds;
 
@@ -443,9 +443,7 @@ Time time_add(Time time, int milliseconds) {
 int time_diff(Time time1, Time time2) {
     int milliseconds1;
     int milliseconds2;
-
-    exit_if_fail(__is_valid_time(time1.hour, time1.minute, time1.second, time1.millisecond));
-    exit_if_fail(__is_valid_time(time2.hour, time2.minute, time2.second, time2.millisecond));
+    exit_if_fail(__is_valid_time(time1) && __is_valid_time(time2));
 
     milliseconds1 = (time1.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time1.minute * SECONDS_PER_MINUTE + time1.second) * MILLISECONDS_PER_SECOND + time1.millisecond;
     milliseconds2 = (time2.hour * MINUTES_PER_HOUR * SECONDS_PER_MINUTE + time2.minute * SECONDS_PER_MINUTE + time2.second) * MILLISECONDS_PER_SECOND + time2.millisecond;
@@ -460,7 +458,7 @@ int time_diff(Time time1, Time time2) {
  */
 char *time_to_string(Time time) {
     char *time_string = NULL;
-    exit_if_fail(__is_valid_time(time.hour, time.minute, time.second, time.millisecond));
+    exit_if_fail(__is_valid_time(time));
 
     time_string = (char *)malloc(sizeof(char) * 13);
     return_value_if_fail(time_string != NULL, NULL);
@@ -470,18 +468,112 @@ char *time_to_string(Time time) {
 }
 
 /**
+ * @brief Determine whether the time interval is valid.
+ * @param time_interval The TimeInterval object.
+ * @return Returns true if the time interval is valid, otherwise returns false.
+ */
+static bool __is_valid_time_interval(TimeInterval time_interval) {
+    if (time_interval.days < 0) {
+        fprintf(stderr, "Error: days must be greater than or equal to 0.\n");
+        return false;
+    }
+
+    if (time_interval.hours < 0 || time_interval.hours >= HOURS_PER_DAY) {
+        fprintf(stderr, "Error: hours must be 0 ~ 23.\n");
+        return false;
+    }
+
+    if (time_interval.minutes < 0 || time_interval.minutes >= MINUTES_PER_HOUR) {
+        fprintf(stderr, "Error: minutes must be 0 ~ 59.\n");
+        return false;
+    }
+
+    if (time_interval.seconds < 0 || time_interval.seconds >= SECONDS_PER_MINUTE) {
+        fprintf(stderr, "Error: seconds must be 0 ~ 59.\n");
+        return false;
+    }
+
+    if (time_interval.milliseconds < 0 || time_interval.milliseconds >= MILLISECONDS_PER_SECOND) {
+        fprintf(stderr, "Error: milliseconds must be 0 ~ 999.\n");
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Normalize the time interval.
+ * @param time_interval The TimeInterval object.
+ */
+static void __time_interval_normalize(TimeInterval *time_interval) {
+    return_if_fail(time_interval != NULL);
+
+    if (time_interval->milliseconds >= MILLISECONDS_PER_SECOND) {
+        time_interval->seconds += time_interval->milliseconds / MILLISECONDS_PER_SECOND;
+        time_interval->milliseconds %= MILLISECONDS_PER_SECOND;
+    }
+
+    if (time_interval->seconds >= SECONDS_PER_MINUTE) {
+        time_interval->minutes += time_interval->seconds / SECONDS_PER_MINUTE;
+        time_interval->seconds %= SECONDS_PER_MINUTE;
+    }
+
+    if (time_interval->minutes >= MINUTES_PER_HOUR) {
+        time_interval->hours += time_interval->minutes / MINUTES_PER_HOUR;
+        time_interval->minutes %= MINUTES_PER_HOUR;
+    }
+
+    if (time_interval->hours >= HOURS_PER_DAY) {
+        time_interval->days += time_interval->hours / HOURS_PER_DAY;
+        time_interval->hours %= HOURS_PER_DAY;
+    }
+}
+
+/**
+ * @brief Create a TimeInterval object.
+ * @param days The days.
+ * @param hours The hours.
+ * @param minutes The minutes.
+ * @param seconds The seconds.
+ * @param milliseconds The milliseconds.
+ * @return Returns the TimeInterval object.
+ */
+TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds) {
+    TimeInterval time_interval;
+    time_interval.days = days;
+    time_interval.hours = hours;
+    time_interval.minutes = minutes;
+    time_interval.seconds = seconds;
+    time_interval.milliseconds = milliseconds;
+    exit_if_fail(__is_valid_time_interval(time_interval));
+    __time_interval_normalize(&time_interval);
+    return time_interval;
+}
+
+/**
+ * @brief Get the string representation of the time interval.
+ * @param time_interval The TimeInterval object.
+ * @return Returns the string representation of the time interval.
+ * @note The caller must free the returned string.
+ */
+char *time_interval_to_string(TimeInterval time_interval) {
+    char *time_interval_string = NULL;
+    exit_if_fail(__is_valid_time_interval(time_interval));
+
+    time_interval_string = (char *)malloc(sizeof(char) * 128);
+    return_value_if_fail(time_interval_string != NULL, NULL);
+
+    sprintf(time_interval_string, "%d day(s) %d hour(s) %d minute(s) %d second(s) %d millisecond(s)", time_interval.days, time_interval.hours, time_interval.minutes, time_interval.seconds, time_interval.milliseconds);
+    return time_interval_string;
+}
+
+/**
  * @brief Determine whether the datetime is valid.
- * @param year The year.
- * @param month The month.
- * @param day The day.
- * @param hour The hour.
- * @param minute The minute.
- * @param second The second.
- * @param millisecond The millisecond.
+ * @param datetime The DateTime object.
  * @return Returns true if the datetime is valid, otherwise returns false.
  */
-static bool __is_valid_datetime(int year, int month, int day, int hour, int minute, int second, int millisecond) {
-    return __is_valid_date(year, month, day) && __is_valid_time(hour, minute, second, millisecond);
+static bool __is_valid_datetime(DateTime datetime) {
+    return __is_valid_date(datetime.date) && __is_valid_time(datetime.time);
 }
 
 /**
@@ -497,9 +589,9 @@ static bool __is_valid_datetime(int year, int month, int day, int hour, int minu
  */
 DateTime datetime_create(int year, int month, int day, int hour, int minute, int second, int millisecond) {
     DateTime datetime;
-    exit_if_fail(__is_valid_datetime(year, month, day, hour, minute, second, millisecond));
     datetime.date = date_create(year, month, day);
     datetime.time = time_create(hour, minute, second, millisecond);
+    exit_if_fail(__is_valid_datetime(datetime));
     return datetime;
 }
 
@@ -523,8 +615,7 @@ DateTime datetime_now() {
  *         Returns 0 if datetime1 is equal to datetime2.
  */
 int datetime_compare(DateTime datetime1, DateTime datetime2) {
-    exit_if_fail(__is_valid_datetime(datetime1.date.year, datetime1.date.month, datetime1.date.day, datetime1.time.hour, datetime1.time.minute, datetime1.time.second, datetime1.time.millisecond));
-    exit_if_fail(__is_valid_datetime(datetime2.date.year, datetime2.date.month, datetime2.date.day, datetime2.time.hour, datetime2.time.minute, datetime2.time.second, datetime2.time.millisecond));
+    exit_if_fail(__is_valid_datetime(datetime1) && __is_valid_datetime(datetime2));
 
     if (date_compare(datetime1.date, datetime2.date) > 0) {
         return 1;
@@ -541,10 +632,15 @@ int datetime_compare(DateTime datetime1, DateTime datetime2) {
     return 0;
 }
 
-#if 0
-DateTime datetime_add(DateTime datetime, int milliseconds) {
+DateTime datetime_add(DateTime datetime, int days, int milliseconds) {
+    exit_if_fail(__is_valid_datetime(datetime));
+
+    datetime.date = date_add(datetime.date, days);
+
+    
 }
 
+#if 0
 int datetime_diff(DateTime datetime1, DateTime datetime2) {
 }
 #endif
@@ -559,11 +655,11 @@ char *datetime_to_string(DateTime datetime) {
     char *datetime_str = NULL;
     char *date_str = NULL;
     char *time_str = NULL;
-    exit_if_fail(__is_valid_datetime(datetime.date.year, datetime.date.month, datetime.date.day, datetime.time.hour, datetime.time.minute, datetime.time.second, datetime.time.millisecond));
+    exit_if_fail(__is_valid_datetime(datetime));
 
     date_str = date_to_string(datetime.date);
     time_str = time_to_string(datetime.time);
-    datetime_str = (char *)malloc(sizeof(char) * (strlen(date_str) + strlen(time_str) + 1));
+    datetime_str = (char *)malloc(sizeof(char) * (strlen(date_str) + strlen(time_str) + 2));
     if (datetime_str == NULL) {
         free(date_str);
         free(time_str);

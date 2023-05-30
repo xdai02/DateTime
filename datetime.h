@@ -72,6 +72,14 @@ typedef struct DateTime {
     Time time;
 } DateTime;
 
+typedef struct TimeInterval {
+    int days;
+    int hours;
+    int minutes;
+    int seconds;
+    int milliseconds;
+} TimeInterval;
+
 /**
  * @brief Determine whether the year is a leap year.
  * @param year The year.
@@ -212,6 +220,25 @@ int time_diff(Time time1, Time time2);
 char *time_to_string(Time time);
 
 /**
+ * @brief Create a TimeInterval object.
+ * @param days The days.
+ * @param hours The hours.
+ * @param minutes The minutes.
+ * @param seconds The seconds.
+ * @param milliseconds The milliseconds.
+ * @return Returns the TimeInterval object.
+ */
+TimeInterval time_interval_create(int days, int hours, int minutes, int seconds, int milliseconds);
+
+/**
+ * @brief Get the string representation of the time interval.
+ * @param time_interval The TimeInterval object.
+ * @return Returns the string representation of the time interval.
+ * @note The caller must free the returned string.
+ */
+char *time_interval_to_string(TimeInterval time_interval);
+
+/**
  * @brief Create a DateTime object.
  * @param year The year.
  * @param month The month.
@@ -240,7 +267,7 @@ DateTime datetime_now();
  */
 int datetime_compare(DateTime datetime1, DateTime datetime2);
 
-DateTime datetime_add(DateTime datetime, int milliseconds);
+DateTime datetime_add(DateTime datetime, int days, int milliseconds);
 
 int datetime_diff(DateTime datetime1, DateTime datetime2);
 
