@@ -288,7 +288,7 @@ DateTime datetime_now();
 
 /**
  * @brief Create a DateTime object from the Unix timestamp (since 1970-01-01 00:00:00 UTC).
- * @param timestamp The Unix timestamp.
+ * @param timestamp The Unix timestamp. The range of timestamp is 0 ~ 2147483647 (2038-01-19 03:14:07 UTC).
  * @return Returns the DateTime object.
  */
 DateTime datetime_from_timestamp(time_t timestamp);

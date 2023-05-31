@@ -715,12 +715,20 @@ DateTime datetime_now() {
 
 /**
  * @brief Create a DateTime object from the Unix timestamp (since 1970-01-01 00:00:00 UTC).
- * @param timestamp The Unix timestamp.
+ * @param timestamp The Unix timestamp. The range of timestamp is 0 ~ 2147483647 (2038-01-19 03:14:07 UTC).
  * @return Returns the DateTime object.
  */
 DateTime datetime_from_timestamp(time_t timestamp) {
     DateTime datetime;
-    struct tm *tm = gmtime(&timestamp);
+    struct tm *tm = NULL;
+
+    const time_t MAX_TIMESTAMP = 2147483647;
+    if (timestamp > MAX_TIMESTAMP) {
+        fprintf(stderr, "Error: timestamp must be less than or equal to %ld.\n", (long)MAX_TIMESTAMP);
+        exit(EXIT_FAILURE);
+    }
+
+    tm = gmtime(&timestamp);
     datetime.date = date_create(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
     datetime.time = time_create(tm->tm_hour, tm->tm_min, tm->tm_sec, 0);
     return datetime;
@@ -735,12 +743,16 @@ time_t datetime_to_timestamp(DateTime datetime) {
     const int SECONDS_PER_COMMON_YEAR = DAYS_IN_COMMON_YEAR * SECONDS_PER_DAY;
     const int SECONDS_PER_LEAP_YEAR = DAYS_IN_LEAP_YEAR * SECONDS_PER_DAY;
 
-    int years_passed = datetime.date.year - 1970;
+    int years_passed = 0;
     int leap_years_passed = 0;
     int non_leap_years_passed = 0;
     time_t seconds_passed = 0;
     int days_passed_current_year = 0;
     int year;
+
+    exit_if_fail(__is_valid_datetime(datetime));
+
+    years_passed = datetime.date.year - 1970;
 
     for (year = 1970; year < datetime.date.year; year++) {
         if (is_leap_year(year)) {
@@ -803,7 +815,21 @@ DateTime datetime_from_ordinal(int ordinal) {
  * @return Returns the ordinal.
  */
 int datetime_to_ordinal(DateTime datetime) {
-    
+    int ordinal = 0;
+    int year;
+    int month;
+    exit_if_fail(__is_valid_datetime(datetime));
+
+    for (year = 1; year < datetime.date.year; year++) {
+        ordinal += days_in_year(year);
+    }
+
+    for (month = JAN; month < datetime.date.month; month++) {
+        ordinal += days_in_month(datetime.date.year, month);
+    }
+
+    ordinal += datetime.date.day;
+    return ordinal;
 }
 
 /**
