@@ -210,7 +210,7 @@ Date date_add(Date date, int days);
 int date_diff(Date date1, Date date2);
 
 /**
- * @brief Get the string representation (yyyy/mm/dd) of the date.
+ * @brief Get the string representation (yyyy-mm-dd) of the date.
  * @param date The Date object.
  * @return Returns the string representation of the date.
  * @note The caller must free the returned string.
@@ -287,6 +287,20 @@ DateTime datetime_create(int year, int month, int day, int hour, int minute, int
 DateTime datetime_now();
 
 /**
+ * @brief Create a DateTime object from the Unix timestamp (since 1970-01-01 00:00:00 UTC).
+ * @param timestamp The Unix timestamp.
+ * @return Returns the DateTime object.
+ */
+DateTime datetime_from_timestamp(time_t timestamp);
+
+/**
+ * @brief Get the Unix timestamp (since 1970-01-01 00:00:00 UTC)
+ * @param datetime The DateTime object.
+ * @return Returns the Unix timestamp.s
+ */
+time_t datetime_timestamp(DateTime datetime);
+
+/**
  * @brief Compare two DateTime objects.
  * @param datetime1 The first DateTime object.
  * @param datetime2 The second DateTime object.
@@ -295,13 +309,6 @@ DateTime datetime_now();
  *         Returns 0 if datetime1 is equal to datetime2.
  */
 int datetime_compare(DateTime datetime1, DateTime datetime2);
-
-/**
- * @brief Get the Unix timestamp (since 1970/01/01 00:00:00 UTC)
- * @param datetime The DateTime object.
- * @return Returns the Unix timestamp.s
- */
-time_t datetime_timestamp(DateTime datetime);
 
 /**
  * @brief Add days and milliseconds to the datetime.
@@ -321,7 +328,7 @@ DateTime datetime_add(DateTime datetime, int days, int milliseconds);
 TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2);
 
 /**
- * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.
+ * @brief Get the string representation (yyyy-mm-dd hh:mm:ss.fff) of the datetime.
  * @param datetime The DateTime object.
  * @return Returns the string representation of the datetime.
  * @note The caller must free the returned string.

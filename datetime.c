@@ -170,7 +170,7 @@ static bool __is_valid_date(Date date) {
     }
 
     if (date.day < 1 || date.day > days_in_month(date.year, date.month)) {
-        fprintf(stderr, "Error: only %d days in %d/%d.\n", days_in_month(date.year, date.month), date.year, date.month);
+        fprintf(stderr, "Error: only %d days in %s %d.\n", days_in_month(date.year, date.month), month_name(date.month), date.year);
         return false;
     }
 
@@ -474,7 +474,7 @@ int date_diff(Date date1, Date date2) {
 }
 
 /**
- * @brief Get the string representation (yyyy/mm/dd) of the date.
+ * @brief Get the string representation (yyyy-mm-dd) of the date.
  * @param date The Date object.
  * @return Returns the string representation of the date.
  * @note The caller must free the returned string.
@@ -486,7 +486,7 @@ char *date_to_string(Date date) {
     date_string = (char *)malloc(sizeof(char) * 11);
     return_value_if_fail(date_string != NULL, NULL);
 
-    sprintf(date_string, "%04d/%02d/%02d", date.year, date.month, date.day);
+    sprintf(date_string, "%04d-%02d-%02d", date.year, date.month, date.day);
     return date_string;
 }
 
@@ -714,33 +714,20 @@ DateTime datetime_now() {
 }
 
 /**
- * @brief Compare two DateTime objects.
- * @param datetime1 The first DateTime object.
- * @param datetime2 The second DateTime object.
- * @return Returns 1 if datetime1 is greater than datetime2.
- *         Returns -1 if datetime1 is less than datetime2.
- *         Returns 0 if datetime1 is equal to datetime2.
+ * @brief Create a DateTime object from the Unix timestamp (since 1970-01-01 00:00:00 UTC).
+ * @param timestamp The Unix timestamp.
+ * @return Returns the DateTime object.
  */
-int datetime_compare(DateTime datetime1, DateTime datetime2) {
-    exit_if_fail(__is_valid_datetime(datetime1) && __is_valid_datetime(datetime2));
-
-    if (date_compare(datetime1.date, datetime2.date) > 0) {
-        return 1;
-    } else if (date_compare(datetime1.date, datetime2.date) < 0) {
-        return -1;
-    }
-
-    if (time_compare(datetime1.time, datetime2.time) > 0) {
-        return 1;
-    } else if (time_compare(datetime1.time, datetime2.time) < 0) {
-        return -1;
-    }
-
-    return 0;
+DateTime datetime_from_timestamp(time_t timestamp) {
+    DateTime datetime;
+    struct tm *tm = gmtime(&timestamp);
+    datetime.date = date_create(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+    datetime.time = time_create(tm->tm_hour, tm->tm_min, tm->tm_sec, 0);
+    return datetime;
 }
 
 /**
- * @brief Get the Unix timestamp (since 1970/01/01 00:00:00 UTC)
+ * @brief Get the Unix timestamp (since 1970-01-01 00:00:00 UTC)
  * @param datetime The DateTime object.
  * @return Returns the Unix timestamp.s
  */
@@ -768,6 +755,32 @@ time_t datetime_timestamp(DateTime datetime) {
     seconds_passed += ((time_t)days_passed_current_year * SECONDS_PER_DAY) + (datetime.time.hour * SECONDS_PER_HOUR) + (datetime.time.minute * SECONDS_PER_MINUTE) + datetime.time.second;
 
     return seconds_passed;
+}
+
+/**
+ * @brief Compare two DateTime objects.
+ * @param datetime1 The first DateTime object.
+ * @param datetime2 The second DateTime object.
+ * @return Returns 1 if datetime1 is greater than datetime2.
+ *         Returns -1 if datetime1 is less than datetime2.
+ *         Returns 0 if datetime1 is equal to datetime2.
+ */
+int datetime_compare(DateTime datetime1, DateTime datetime2) {
+    exit_if_fail(__is_valid_datetime(datetime1) && __is_valid_datetime(datetime2));
+
+    if (date_compare(datetime1.date, datetime2.date) > 0) {
+        return 1;
+    } else if (date_compare(datetime1.date, datetime2.date) < 0) {
+        return -1;
+    }
+
+    if (time_compare(datetime1.time, datetime2.time) > 0) {
+        return 1;
+    } else if (time_compare(datetime1.time, datetime2.time) < 0) {
+        return -1;
+    }
+
+    return 0;
 }
 
 /**
@@ -875,7 +888,7 @@ TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2) {
 }
 
 /**
- * @brief Get the string representation (yyyy/mm/dd hh:mm:ss.fff) of the datetime.
+ * @brief Get the string representation (yyyy-mm-dd hh:mm:ss.fff) of the datetime.
  * @param datetime The DateTime object.
  * @return Returns the string representation of the datetime.
  * @note The caller must free the returned string.

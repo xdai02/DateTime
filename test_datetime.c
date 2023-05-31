@@ -359,22 +359,22 @@ void test_date_to_string() {
 
     date = date_create(2000, JAN, 1);
     str = date_to_string(date);
-    assert(strcmp(str, "2000/01/01") == 0);
+    assert(strcmp(str, "2000-01-01") == 0);
     free(str);
 
     date = date_create(2000, FEB, 29);
     str = date_to_string(date);
-    assert(strcmp(str, "2000/02/29") == 0);
+    assert(strcmp(str, "2000-02-29") == 0);
     free(str);
 
     date = date_create(2023, MAY, 17);
     str = date_to_string(date);
-    assert(strcmp(str, "2023/05/17") == 0);
+    assert(strcmp(str, "2023-05-17") == 0);
     free(str);
 
     date = date_create(2024, DEC, 4);
     str = date_to_string(date);
-    assert(strcmp(str, "2024/12/04") == 0);
+    assert(strcmp(str, "2024-12-04") == 0);
     free(str);
 
     printf("[PASS] date_to_string\n");
@@ -620,6 +620,87 @@ void test_datetime_now() {
     printf("[PASS] datetime_now\n");
 }
 
+void test_datetime_from_timestamp() {
+    DateTime datetime;
+
+    datetime = datetime_from_timestamp(0);
+    assert(datetime.date.year == 1970);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(86400);
+    assert(datetime.date.year == 1970);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 2);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(2678400);
+    assert(datetime.date.year == 1970);
+    assert(datetime.date.month == FEB);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(31536000);
+    assert(datetime.date.year == 1971);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(978220800);
+    assert(datetime.date.year == 2000);
+    assert(datetime.date.month == DEC);
+    assert(datetime.date.day == 31);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(1685318400);
+    assert(datetime.date.year == 2023);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 29);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_timestamp(253402214400);
+    assert(datetime.date.year == 9999);
+    assert(datetime.date.month == DEC);
+    assert(datetime.date.day == 31);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    printf("[PASS] datetime_from_timestamp\n");
+}
+
+void test_datetime_timestamp() {
+    assert(datetime_timestamp(datetime_create(1970, JAN, 1, 0, 0, 0, 0)) == 0);
+    assert(datetime_timestamp(datetime_create(1970, JAN, 2, 0, 0, 0, 0)) == 86400);
+    assert(datetime_timestamp(datetime_create(1970, FEB, 1, 0, 0, 0, 0)) == 2678400);
+    assert(datetime_timestamp(datetime_create(1971, JAN, 1, 0, 0, 0, 0)) == 31536000);
+    assert(datetime_timestamp(datetime_create(2000, DEC, 31, 0, 0, 0, 0)) == 978220800);
+    assert(datetime_timestamp(datetime_create(2023, MAY, 29, 0, 0, 0, 0)) == 1685318400);
+    assert(datetime_timestamp(datetime_create(9999, DEC, 31, 0, 0, 0, 0)) == 253402214400);
+
+    printf("[PASS] datetime_timestamp\n");
+}
+
 void test_datetime_compare() {
     DateTime datetime1;
     DateTime datetime2;
@@ -657,18 +738,6 @@ void test_datetime_compare() {
     assert(datetime_compare(datetime1, datetime2) < 0);
 
     printf("[PASS] datetime_compare\n");
-}
-
-void test_datetime_timestamp() {
-    assert(datetime_timestamp(datetime_create(1970, JAN, 1, 0, 0, 0, 0)) == 0);
-    assert(datetime_timestamp(datetime_create(1970, JAN, 2, 0, 0, 0, 0)) == 86400);
-    assert(datetime_timestamp(datetime_create(1970, FEB, 1, 0, 0, 0, 0)) == 2678400);
-    assert(datetime_timestamp(datetime_create(1971, JAN, 1, 0, 0, 0, 0)) == 31536000);
-    assert(datetime_timestamp(datetime_create(2000, DEC, 31, 0, 0, 0, 0)) == 978220800);
-    assert(datetime_timestamp(datetime_create(2023, MAY, 29, 0, 0, 0, 0)) == 1685318400);
-    assert(datetime_timestamp(datetime_create(9999, DEC, 31, 0, 0, 0, 0)) == 253402214400);
-
-    printf("[PASS] datetime_timestamp\n");
 }
 
 void test_datetime_add() {
@@ -759,12 +828,12 @@ void test_datetime_to_string() {
 
     datetime = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
     str = datetime_to_string(datetime);
-    assert(strcmp(str, "2000/01/01 00:00:00.000") == 0);
+    assert(strcmp(str, "2000-01-01 00:00:00.000") == 0);
     free(str);
 
     datetime = datetime_create(2000, JAN, 1, 23, 59, 59, 999);
     str = datetime_to_string(datetime);
-    assert(strcmp(str, "2000/01/01 23:59:59.999") == 0);
+    assert(strcmp(str, "2000-01-01 23:59:59.999") == 0);
     free(str);
 
     printf("[PASS] datetime_to_string\n");
@@ -799,8 +868,9 @@ int main() {
 
     test_datetime_create();
     test_datetime_now();
-    test_datetime_compare();
+    test_datetime_from_timestamp();
     test_datetime_timestamp();
+    test_datetime_compare();
     test_datetime_add();
     test_datetime_diff();
     test_datetime_to_string();
