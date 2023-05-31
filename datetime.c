@@ -727,11 +727,11 @@ DateTime datetime_from_timestamp(time_t timestamp) {
 }
 
 /**
- * @brief Get the Unix timestamp (since 1970-01-01 00:00:00 UTC)
+ * @brief Convert the DateTime object to the Unix timestamp (since 1970-01-01 00:00:00 UTC).
  * @param datetime The DateTime object.
- * @return Returns the Unix timestamp.s
+ * @return Returns the Unix timestamp.
  */
-time_t datetime_timestamp(DateTime datetime) {
+time_t datetime_to_timestamp(DateTime datetime) {
     const int SECONDS_PER_COMMON_YEAR = DAYS_IN_COMMON_YEAR * SECONDS_PER_DAY;
     const int SECONDS_PER_LEAP_YEAR = DAYS_IN_LEAP_YEAR * SECONDS_PER_DAY;
 
@@ -755,6 +755,55 @@ time_t datetime_timestamp(DateTime datetime) {
     seconds_passed += ((time_t)days_passed_current_year * SECONDS_PER_DAY) + (datetime.time.hour * SECONDS_PER_HOUR) + (datetime.time.minute * SECONDS_PER_MINUTE) + datetime.time.second;
 
     return seconds_passed;
+}
+
+/**
+ * @brief Create a DateTime object from the ordinal (since 0001-01-01 00:00:00).
+ * @param ordinal The ordinal.
+ * @return Returns the DateTime object.
+ */
+DateTime datetime_from_ordinal(int ordinal) {
+    DateTime datetime;
+    int year = 1;
+    int month = JAN;
+    int days = 0;
+
+    if (ordinal <= 0) {
+        fprintf(stderr, "Error: ordinal must be greater than 0.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    while (ordinal > 0) {
+        days = days_in_year(year);
+
+        if (ordinal >= days) {
+            ordinal -= days;
+            year++;
+        } else {
+            for (month = JAN; month <= DEC; month++) {
+                days = days_in_month(year, month);
+                if (ordinal >= days) {
+                    ordinal -= days;
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    datetime.date = date_create(year, month, ordinal);
+    datetime.time = time_create(0, 0, 0, 0);
+    return datetime;
+}
+
+/**
+ * @brief Convert the DateTime object to the ordinal (since 0001-01-01 00:00:00).
+ * @param datetime The DateTime object.
+ * @return Returns the ordinal.
+ */
+int datetime_to_ordinal(DateTime datetime) {
+    
 }
 
 /**

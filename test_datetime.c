@@ -689,16 +689,90 @@ void test_datetime_from_timestamp() {
     printf("[PASS] datetime_from_timestamp\n");
 }
 
-void test_datetime_timestamp() {
-    assert(datetime_timestamp(datetime_create(1970, JAN, 1, 0, 0, 0, 0)) == 0);
-    assert(datetime_timestamp(datetime_create(1970, JAN, 2, 0, 0, 0, 0)) == 86400);
-    assert(datetime_timestamp(datetime_create(1970, FEB, 1, 0, 0, 0, 0)) == 2678400);
-    assert(datetime_timestamp(datetime_create(1971, JAN, 1, 0, 0, 0, 0)) == 31536000);
-    assert(datetime_timestamp(datetime_create(2000, DEC, 31, 0, 0, 0, 0)) == 978220800);
-    assert(datetime_timestamp(datetime_create(2023, MAY, 29, 0, 0, 0, 0)) == 1685318400);
-    assert(datetime_timestamp(datetime_create(9999, DEC, 31, 0, 0, 0, 0)) == 253402214400);
+void test_datetime_to_timestamp() {
+    assert(datetime_to_timestamp(datetime_create(1970, JAN, 1, 0, 0, 0, 0)) == 0);
+    assert(datetime_to_timestamp(datetime_create(1970, JAN, 2, 0, 0, 0, 0)) == 86400);
+    assert(datetime_to_timestamp(datetime_create(1970, FEB, 1, 0, 0, 0, 0)) == 2678400);
+    assert(datetime_to_timestamp(datetime_create(1971, JAN, 1, 0, 0, 0, 0)) == 31536000);
+    assert(datetime_to_timestamp(datetime_create(2000, DEC, 31, 0, 0, 0, 0)) == 978220800);
+    assert(datetime_to_timestamp(datetime_create(2023, MAY, 29, 0, 0, 0, 0)) == 1685318400);
+    assert(datetime_to_timestamp(datetime_create(9999, DEC, 31, 0, 0, 0, 0)) == 253402214400);
 
-    printf("[PASS] datetime_timestamp\n");
+    printf("[PASS] datetime_to_timestamp\n");
+}
+
+void test_datetime_from_ordinal() {
+    DateTime datetime;
+
+    datetime = datetime_from_ordinal(1);
+    assert(datetime.date.year == 1);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 1);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(100);
+    assert(datetime.date.year == 1);
+    assert(datetime.date.month == APR);
+    assert(datetime.date.day == 10);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(1000);
+    assert(datetime.date.year == 3);
+    assert(datetime.date.month == SEP);
+    assert(datetime.date.day == 27);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(10000);
+    assert(datetime.date.year == 28);
+    assert(datetime.date.month == MAY);
+    assert(datetime.date.day == 18);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(100000);
+    assert(datetime.date.year == 274);
+    assert(datetime.date.month == OCT);
+    assert(datetime.date.day == 16);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(730920);
+    assert(datetime.date.year == 2002);
+    assert(datetime.date.month == MAR);
+    assert(datetime.date.day == 11);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    datetime = datetime_from_ordinal(740000);
+    assert(datetime.date.year == 2027);
+    assert(datetime.date.month == JAN);
+    assert(datetime.date.day == 19);
+    assert(datetime.time.hour == 0);
+    assert(datetime.time.minute == 0);
+    assert(datetime.time.second == 0);
+    assert(datetime.time.millisecond == 0);
+
+    printf("[PASS] datetime_from_ordinal\n");
+}
+
+void test_datetime_to_ordinal() {
+    printf(" TODO TODO TODO TODO TODO");
+    printf("[PASS] datetime_to_ordinal\n");
 }
 
 void test_datetime_compare() {
@@ -869,7 +943,8 @@ int main() {
     test_datetime_create();
     test_datetime_now();
     test_datetime_from_timestamp();
-    test_datetime_timestamp();
+    test_datetime_to_timestamp();
+    test_datetime_from_ordinal();
     test_datetime_compare();
     test_datetime_add();
     test_datetime_diff();

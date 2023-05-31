@@ -294,11 +294,25 @@ DateTime datetime_now();
 DateTime datetime_from_timestamp(time_t timestamp);
 
 /**
- * @brief Get the Unix timestamp (since 1970-01-01 00:00:00 UTC)
+ * @brief Convert the DateTime object to the Unix timestamp (since 1970-01-01 00:00:00 UTC).
  * @param datetime The DateTime object.
- * @return Returns the Unix timestamp.s
+ * @return Returns the Unix timestamp.
  */
-time_t datetime_timestamp(DateTime datetime);
+time_t datetime_to_timestamp(DateTime datetime);
+
+/**
+ * @brief Create a DateTime object from the ordinal (since 0001-01-01 00:00:00).
+ * @param ordinal The ordinal.
+ * @return Returns the DateTime object.
+ */
+DateTime datetime_from_ordinal(int ordinal);
+
+/**
+ * @brief Convert the DateTime object to the ordinal (since 0001-01-01 00:00:00).
+ * @param datetime The DateTime object.
+ * @return Returns the ordinal.
+ */
+int datetime_to_ordinal(DateTime datetime);
 
 /**
  * @brief Compare two DateTime objects.
