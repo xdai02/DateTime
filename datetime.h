@@ -1,6 +1,8 @@
 #ifndef _DATETIME_H_
 #define _DATETIME_H_
 
+#include <time.h>
+
 typedef int bool;
 #define true 1
 #define false 0
@@ -48,7 +50,7 @@ typedef enum Month {
     DEC
 } Month;
 
-typedef enum Day {
+typedef enum Weekday {
     SUN,
     MON,
     TUE,
@@ -56,7 +58,7 @@ typedef enum Day {
     THU,
     FRI,
     SAT
-} Day;
+} Weekday;
 
 typedef struct TimeInterval {
     int days;
@@ -99,11 +101,11 @@ bool is_leap_year(int year);
 const char *month_name(Month month);
 
 /**
- * @brief Get the full name of the day.
- * @param day The day.
- * @return Returns the full name of the day.
+ * @brief Get the full name of the weekday.
+ * @param weekday The weekday.
+ * @return Returns the full name of the weekday.
  */
-const char *day_name(Day day);
+const char *weekday_name(Weekday weekday);
 
 /**
  * @brief Get the number of days in the month.
@@ -130,13 +132,13 @@ int days_in_year(int year);
 int nth_day_of_year(int year, int month, int day);
 
 /**
- * @brief Determine the given date is the n-th day of the week.
+ * @brief Determine the day of the week.
  * @param year The year.
  * @param month The month.
  * @param day The day.
- * @return Returns the n-th day of the week.
+ * @return Returns the day of the week.
  */
-Day nth_day_of_week(int year, int month, int day);
+Weekday weekday(int year, int month, int day);
 
 /**
  * @brief Get the string representation of the calendar for the given month.
@@ -293,6 +295,13 @@ DateTime datetime_now();
  *         Returns 0 if datetime1 is equal to datetime2.
  */
 int datetime_compare(DateTime datetime1, DateTime datetime2);
+
+/**
+ * @brief Get the Unix timestamp (since 1970/01/01 00:00:00 UTC)
+ * @param datetime The DateTime object.
+ * @return Returns the Unix timestamp.s
+ */
+time_t datetime_timestamp(DateTime datetime);
 
 /**
  * @brief Add days and milliseconds to the datetime.

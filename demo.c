@@ -5,7 +5,7 @@
 int main() {
     Date today = date_now();
     char *today_str = date_to_string(today);
-    printf("Today is %s (%s)\n", today_str, day_name(nth_day_of_week(today.year, today.month, today.day)));
+    printf("Today is %s (%s)\n", today_str, weekday_name(weekday(today.year, today.month, today.day)));
     free(today_str);
     printf("\n");
 
@@ -16,7 +16,7 @@ int main() {
 
     Date date = date_add(today, 15);
     char *date_str = date_to_string(date);
-    printf("15 days later is %s (%s)\n", date_str, day_name(nth_day_of_week(date.year, date.month, date.day)));
+    printf("15 days later is %s (%s)\n", date_str, weekday_name(weekday(date.year, date.month, date.day)));
     free(date_str);
 
     int date_difference = date_diff(today, date);

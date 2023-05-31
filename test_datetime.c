@@ -38,14 +38,14 @@ void test_month_name() {
     printf("[PASS] month_name\n");
 }
 
-void test_day_name() {
-    assert(strcmp(day_name(SUN), "Sunday") == 0);
-    assert(strcmp(day_name(MON), "Monday") == 0);
-    assert(strcmp(day_name(TUE), "Tuesday") == 0);
-    assert(strcmp(day_name(WED), "Wednesday") == 0);
-    assert(strcmp(day_name(THU), "Thursday") == 0);
-    assert(strcmp(day_name(FRI), "Friday") == 0);
-    assert(strcmp(day_name(SAT), "Saturday") == 0);
+void test_weekday_name() {
+    assert(strcmp(weekday_name(SUN), "Sunday") == 0);
+    assert(strcmp(weekday_name(MON), "Monday") == 0);
+    assert(strcmp(weekday_name(TUE), "Tuesday") == 0);
+    assert(strcmp(weekday_name(WED), "Wednesday") == 0);
+    assert(strcmp(weekday_name(THU), "Thursday") == 0);
+    assert(strcmp(weekday_name(FRI), "Friday") == 0);
+    assert(strcmp(weekday_name(SAT), "Saturday") == 0);
 
     printf("[PASS] day_name\n");
 }
@@ -105,25 +105,25 @@ void test_nth_day_of_year() {
     printf("[PASS] nth_day_of_year\n");
 }
 
-void test_nth_day_of_week() {
-    assert(nth_day_of_week(1900, JAN, 1) == MON);
-    assert(nth_day_of_week(1900, DEC, 31) == MON);
-    assert(nth_day_of_week(1970, FEB, 1) == SUN);
-    assert(nth_day_of_week(1970, DEC, 1) == TUE);
-    assert(nth_day_of_week(2000, JAN, 31) == MON);
-    assert(nth_day_of_week(2000, FEB, 1) == TUE);
-    assert(nth_day_of_week(2000, FEB, 29) == TUE);
-    assert(nth_day_of_week(2000, MAR, 1) == WED);
-    assert(nth_day_of_week(2000, NOV, 30) == THU);
-    assert(nth_day_of_week(2000, DEC, 31) == SUN);
-    assert(nth_day_of_week(2023, JAN, 1) == SUN);
-    assert(nth_day_of_week(2023, FEB, 1) == WED);
-    assert(nth_day_of_week(2023, FEB, 28) == TUE);
-    assert(nth_day_of_week(2023, MAR, 1) == WED);
-    assert(nth_day_of_week(2023, NOV, 30) == THU);
-    assert(nth_day_of_week(2023, DEC, 31) == SUN);
+void test_weekday() {
+    assert(weekday(1900, JAN, 1) == MON);
+    assert(weekday(1900, DEC, 31) == MON);
+    assert(weekday(1970, FEB, 1) == SUN);
+    assert(weekday(1970, DEC, 1) == TUE);
+    assert(weekday(2000, JAN, 31) == MON);
+    assert(weekday(2000, FEB, 1) == TUE);
+    assert(weekday(2000, FEB, 29) == TUE);
+    assert(weekday(2000, MAR, 1) == WED);
+    assert(weekday(2000, NOV, 30) == THU);
+    assert(weekday(2000, DEC, 31) == SUN);
+    assert(weekday(2023, JAN, 1) == SUN);
+    assert(weekday(2023, FEB, 1) == WED);
+    assert(weekday(2023, FEB, 28) == TUE);
+    assert(weekday(2023, MAR, 1) == WED);
+    assert(weekday(2023, NOV, 30) == THU);
+    assert(weekday(2023, DEC, 31) == SUN);
 
-    printf("[PASS] nth_day_of_week\n");
+    printf("[PASS] weekday\n");
 }
 
 void test_calendar() {
@@ -659,6 +659,18 @@ void test_datetime_compare() {
     printf("[PASS] datetime_compare\n");
 }
 
+void test_datetime_timestamp() {
+    assert(datetime_timestamp(datetime_create(1970, JAN, 1, 0, 0, 0, 0)) == 0);
+    assert(datetime_timestamp(datetime_create(1970, JAN, 2, 0, 0, 0, 0)) == 86400);
+    assert(datetime_timestamp(datetime_create(1970, FEB, 1, 0, 0, 0, 0)) == 2678400);
+    assert(datetime_timestamp(datetime_create(1971, JAN, 1, 0, 0, 0, 0)) == 31536000);
+    assert(datetime_timestamp(datetime_create(2000, DEC, 31, 0, 0, 0, 0)) == 978220800);
+    assert(datetime_timestamp(datetime_create(2023, MAY, 29, 0, 0, 0, 0)) == 1685318400);
+    assert(datetime_timestamp(datetime_create(9999, DEC, 31, 0, 0, 0, 0)) == 253402214400);
+
+    printf("[PASS] datetime_timestamp\n");
+}
+
 void test_datetime_add() {
     DateTime datetime;
 
@@ -761,11 +773,11 @@ void test_datetime_to_string() {
 int main() {
     test_is_leap_year();
     test_month_name();
-    test_day_name();
+    test_weekday_name();
     test_days_in_month();
     test_days_in_year();
     test_nth_day_of_year();
-    test_nth_day_of_week();
+    test_weekday();
     test_calendar();
 
     test_time_interval_create();
@@ -788,6 +800,7 @@ int main() {
     test_datetime_create();
     test_datetime_now();
     test_datetime_compare();
+    test_datetime_timestamp();
     test_datetime_add();
     test_datetime_diff();
     test_datetime_to_string();

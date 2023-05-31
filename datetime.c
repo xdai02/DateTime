@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -90,12 +89,12 @@ const char *month_name(Month month) {
 }
 
 /**
- * @brief Get the full name of the day.
- * @param day The day.
- * @return Returns the full name of the day.
+ * @brief Get the full name of the weekday.
+ * @param weekday The weekday.
+ * @return Returns the full name of the weekday.
  */
-const char *day_name(Day day) {
-    switch (day) {
+const char *weekday_name(Weekday weekday) {
+    switch (weekday) {
     case SUN:
         return "Sunday";
     case MON:
@@ -202,13 +201,13 @@ int nth_day_of_year(int year, int month, int day) {
 }
 
 /**
- * @brief Determine the given date is the n-th day of the week.
+ * @brief Determine the day of the week.
  * @param year The year.
  * @param month The month.
  * @param day The day.
- * @return Returns the n-th day of the week.
+ * @return Returns the day of the week.
  */
-Day nth_day_of_week(int year, int month, int day) {
+Weekday weekday(int year, int month, int day) {
     Date date;
     int h;
 
@@ -223,7 +222,7 @@ Day nth_day_of_week(int year, int month, int day) {
     }
     h = (day + (26 * (month + 1)) / 10 + year + year / 4 - year / 100 + year / 400) % DAYS_IN_WEEK;
     h = (h + 6) % DAYS_IN_WEEK;
-    return (Day)h;
+    return (Weekday)h;
 }
 
 /**
@@ -236,7 +235,7 @@ Day nth_day_of_week(int year, int month, int day) {
 char *calendar(int year, int month) {
     char *calendar = NULL;
     int days = 0;
-    Day first_day;
+    Weekday first_day;
     int k = 0;
     int i = 0;
     char buf[32];
@@ -246,7 +245,7 @@ char *calendar(int year, int month) {
 
     sprintf(calendar, "            %s %04d\n", month_name(month), year);
     days = days_in_month(year, month);
-    first_day = nth_day_of_week(year, month, 1);
+    first_day = weekday(year, month, 1);
     strcat(calendar, " Sun  Mon  Tue  Wed  Thu  Fri  Sat\n");
 
     for (k = 0; k < first_day; k++) {
@@ -738,6 +737,37 @@ int datetime_compare(DateTime datetime1, DateTime datetime2) {
     }
 
     return 0;
+}
+
+/**
+ * @brief Get the Unix timestamp (since 1970/01/01 00:00:00 UTC)
+ * @param datetime The DateTime object.
+ * @return Returns the Unix timestamp.s
+ */
+time_t datetime_timestamp(DateTime datetime) {
+    const int SECONDS_PER_COMMON_YEAR = DAYS_IN_COMMON_YEAR * SECONDS_PER_DAY;
+    const int SECONDS_PER_LEAP_YEAR = DAYS_IN_LEAP_YEAR * SECONDS_PER_DAY;
+
+    int years_passed = datetime.date.year - 1970;
+    int leap_years_passed = 0;
+    int non_leap_years_passed = 0;
+    time_t seconds_passed = 0;
+    int days_passed_current_year = 0;
+    int year;
+
+    for (year = 1970; year < datetime.date.year; year++) {
+        if (is_leap_year(year)) {
+            leap_years_passed++;
+        }
+    }
+    non_leap_years_passed = years_passed - leap_years_passed;
+
+    seconds_passed = ((time_t)non_leap_years_passed * SECONDS_PER_COMMON_YEAR) + ((time_t)leap_years_passed * SECONDS_PER_LEAP_YEAR);
+
+    days_passed_current_year = nth_day_of_year(datetime.date.year, datetime.date.month, datetime.date.day) - 1;
+    seconds_passed += ((time_t)days_passed_current_year * SECONDS_PER_DAY) + (datetime.time.hour * SECONDS_PER_HOUR) + (datetime.time.minute * SECONDS_PER_MINUTE) + datetime.time.second;
+
+    return seconds_passed;
 }
 
 /**
