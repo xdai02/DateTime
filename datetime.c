@@ -226,12 +226,20 @@ Day nth_day_of_week(int year, int month, int day) {
     return (Day)h;
 }
 
-const char *calendar(int year, int month) {
+/**
+ * @brief Get the string representation of the calendar for the given month.
+ * @param year The year.
+ * @param month The month.
+ * @return Returns the string representation of the calendar for the given month.
+ * @note The caller must free the returned string.
+ */
+char *calendar(int year, int month) {
     char *calendar = NULL;
     int days = 0;
     Day first_day;
     int k = 0;
     int i = 0;
+    char buf[32];
 
     calendar = (char *)malloc(sizeof(char) * 256);
     return_value_if_fail(calendar != NULL, NULL);
@@ -239,23 +247,24 @@ const char *calendar(int year, int month) {
     sprintf(calendar, "            %s %04d\n", month_name(month), year);
     days = days_in_month(year, month);
     first_day = nth_day_of_week(year, month, 1);
-    sprintf(calendar, "%s Sun  Mon  Tue  Wed  Thu  Fri  Sat\n", calendar);
+    strcat(calendar, " Sun  Mon  Tue  Wed  Thu  Fri  Sat\n");
 
     for (k = 0; k < first_day; k++) {
-        sprintf(calendar, "%s     ", calendar);
+        strcat(calendar, "     ");
     }
 
     for (i = 1; i <= days; i++) {
-        sprintf(calendar, "%s%4d ", calendar, i);
+        sprintf(buf, "%4d ", i);
+        strcat(calendar, buf);
         k++;
-        if (k > 6) {
+        if (k >= DAYS_IN_WEEK) {
             k = 0;
-            sprintf(calendar, "%s\n", calendar);
+            strcat(calendar, "\n");
         }
     }
 
     if (k != 0) {
-        sprintf(calendar, "%s\n", calendar);
+        strcat(calendar, "\n");
     }
 
     return calendar;

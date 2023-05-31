@@ -126,6 +126,18 @@ void test_nth_day_of_week() {
     printf("[PASS] nth_day_of_week\n");
 }
 
+void test_calendar() {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    int year = tm.tm_year + 1900;
+    int month = tm.tm_mon + 1;
+    char *str = calendar(year, month);
+    printf("%s", str);
+    free((void *)str);
+
+    printf("[PASS] calendar\n");
+}
+
 void test_time_interval_create() {
     TimeInterval time_interval;
 
@@ -754,6 +766,7 @@ int main() {
     test_days_in_year();
     test_nth_day_of_year();
     test_nth_day_of_week();
+    test_calendar();
 
     test_time_interval_create();
     test_time_interval_to_string();

@@ -139,6 +139,15 @@ int nth_day_of_year(int year, int month, int day);
 Day nth_day_of_week(int year, int month, int day);
 
 /**
+ * @brief Get the string representation of the calendar for the given month.
+ * @param year The year.
+ * @param month The month.
+ * @return Returns the string representation of the calendar for the given month.
+ * @note The caller must free the returned string.
+ */
+char *calendar(int year, int month);
+
+/**
  * @brief Create a TimeInterval object.
  * @param days The days.
  * @param hours The hours.
