@@ -105,7 +105,14 @@ const char *month_name(Month month);
  * @param weekday The weekday.
  * @return Returns the full name of the weekday.
  */
-const char *weekday_name(Weekday weekday);
+const char *weekday_full_name(Weekday weekday);
+
+/**
+ * @brief Get the abbreviated name of the weekday.
+ * @param weekday The weekday.
+ * @return Returns the abbreviated name of the weekday.
+ */
+const char *weekday_abbr_name(Weekday weekday);
 
 /**
  * @brief Get the number of days in the month.
@@ -372,5 +379,37 @@ char *datetime_to_string(DateTime datetime);
  * @note The caller must free the returned string.
  */
 char *datetime_ascii_string(DateTime datetime);
+
+/**
+ * @brief Get the specified string representation of the datetime.
+ * @param datetime The DateTime object.
+ * @param format The format string.
+ * | Specifier | Replaced by                                                           | Example                  |
+ * | %a        | Abbreviated weekday name                                              | Sun                      |
+ * | %A        | Full weekday name                                                     | Sunday                   |
+ * | %b        | Abbreviated month name                                                | Mar                      |
+ * | %B        | Full month name                                                       | March                    |
+ * | %c        | Date and time representation for the current locale                   | Sun Aug 19 02:56:02 2012 |
+ * | %d        | Day of the month (01-31)                                              | 19                       |
+ * | %H        | Hour in 24h format (00-23)                                            | 14                       |
+ * | %I        | Hour in 12h format (01-12)                                            | 02                       |
+ * | %j        | Day of the year (001-366)                                             | 231                      |
+ * | %m        | Month as a decimal number (01-12)                                     | 08                       |
+ * | %M        | Minute (00-59)                                                        | 55                       |
+ * | %p        | AM or PM                                                              | PM                       |
+ * | %S        | Second (00-61)                                                        | 02                       |
+ * | %U        | Week number of the year (Sunday as the first day of the week) (00-53) | 33                       |
+ * | %w        | Weekday as a decimal number (0-6)                                     | 4                        |
+ * | %W        | Week number of the year (Monday as the first day of the week) (00-53) | 34                       |
+ * | %x        | Date representation for the current locale                            | 08/19/12                 |
+ * | %X        | Time representation for the current locale                            | 02:50:06                 |
+ * | %y        | Year without century (00-99)                                          | 01                       |
+ * | %Y        | Year with century                                                     | 2001                     |
+ * | %z        | Timezone offset (+0000)                                               | +0000                    |
+ * | %%        | A % sign                                                              | %                        |
+ * @return Returns the specified string representation of the datetime.
+ * @note The caller must free the returned string.
+ */
+char *datetime_format_string(DateTime datetime, const char *format);
 
 #endif

@@ -38,16 +38,28 @@ void test_month_name() {
     printf("[PASS] month_name\n");
 }
 
-void test_weekday_name() {
-    assert(strcmp(weekday_name(SUN), "Sunday") == 0);
-    assert(strcmp(weekday_name(MON), "Monday") == 0);
-    assert(strcmp(weekday_name(TUE), "Tuesday") == 0);
-    assert(strcmp(weekday_name(WED), "Wednesday") == 0);
-    assert(strcmp(weekday_name(THU), "Thursday") == 0);
-    assert(strcmp(weekday_name(FRI), "Friday") == 0);
-    assert(strcmp(weekday_name(SAT), "Saturday") == 0);
+void test_weekday_full_name() {
+    assert(strcmp(weekday_full_name(SUN), "Sunday") == 0);
+    assert(strcmp(weekday_full_name(MON), "Monday") == 0);
+    assert(strcmp(weekday_full_name(TUE), "Tuesday") == 0);
+    assert(strcmp(weekday_full_name(WED), "Wednesday") == 0);
+    assert(strcmp(weekday_full_name(THU), "Thursday") == 0);
+    assert(strcmp(weekday_full_name(FRI), "Friday") == 0);
+    assert(strcmp(weekday_full_name(SAT), "Saturday") == 0);
 
-    printf("[PASS] day_name\n");
+    printf("[PASS] weekday_full_name\n");
+}
+
+void test_weekday_abbr_name() {
+    assert(strcmp(weekday_abbr_name(SUN), "Sun") == 0);
+    assert(strcmp(weekday_abbr_name(MON), "Mon") == 0);
+    assert(strcmp(weekday_abbr_name(TUE), "Tue") == 0);
+    assert(strcmp(weekday_abbr_name(WED), "Wed") == 0);
+    assert(strcmp(weekday_abbr_name(THU), "Thu") == 0);
+    assert(strcmp(weekday_abbr_name(FRI), "Fri") == 0);
+    assert(strcmp(weekday_abbr_name(SAT), "Sat") == 0);
+
+    printf("[PASS] weekday_abbr_name\n");
 }
 
 void test_days_in_month() {
@@ -1011,10 +1023,38 @@ void test_datetime_ascii_string() {
     printf("[PASS] datetime_ascii_string\n");
 }
 
+void test_datetime_format_string() {
+    DateTime datetime;
+    char *str;
+
+    datetime = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    str = datetime_format_string(datetime, "%Y-%m-%d %H:%M:%S");
+    assert(strcmp(str, "2000-01-01 00:00:00") == 0);
+    free(str);
+
+    datetime = datetime_create(2000, FEB, 29, 23, 59, 59, 999);
+    str = datetime_format_string(datetime, "[%x - %I:%M%p]");
+    assert(strcmp(str, "[02/29/00 - 11:59PM]") == 0);
+    free(str);
+
+    datetime = datetime_create(2023, MAY, 17, 12, 0, 0, 0);
+    str = datetime_format_string(datetime, "%m/%d/%Y, %H:%M:%S");
+    assert(strcmp(str, "05/17/2023, 12:00:00") == 0);
+    free(str);
+
+    datetime = datetime_create(2024, DEC, 4, 12, 30, 0, 0);
+    str = datetime_format_string(datetime, "%A, %d. %B %Y %I:%M%p");
+    assert(strcmp(str, "Wednesday, 04. December 2024 12:30PM") == 0);
+    free(str);
+
+    printf("[PASS] datetime_format_string\n");
+}
+
 int main() {
     test_is_leap_year();
     test_month_name();
-    test_weekday_name();
+    test_weekday_full_name();
+    test_weekday_abbr_name();
     test_days_in_month();
     test_days_in_year();
     test_nth_day_of_year();
@@ -1051,6 +1091,7 @@ int main() {
     test_datetime_diff();
     test_datetime_to_string();
     test_datetime_ascii_string();
+    test_datetime_format_string();
 
     printf("[PASS] All\n");
     return 0;
