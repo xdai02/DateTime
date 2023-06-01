@@ -506,12 +506,12 @@ char *date_ascii_string(Date date) {
     tm.tm_mon = date.month - 1;
     tm.tm_mday = date.day;
 
-    date_string = (char *)malloc(sizeof(char) * 16);
+    date_string = (char *)calloc(16, sizeof(char));
     return_value_if_fail(date_string != NULL, NULL);
 
     strncpy(weekday_abbr, weekday_name(weekday(date.year, date.month, date.day)), 3);
-    strftime(date_string, 16, "%b %d %Y", &tm);
-    memmove(date_string + 4, date_string, 12);
+    strftime(date_string, 13, " %b %d %Y", &tm);
+    memmove(date_string + 3, date_string, 12);
     memcpy(date_string, weekday_abbr, 3);
     return date_string;
 }
@@ -697,6 +697,28 @@ char *time_to_string(Time time) {
     return_value_if_fail(time_string != NULL, NULL);
 
     sprintf(time_string, "%02d:%02d:%02d.%03d", time.hour, time.minute, time.second, time.millisecond);
+    return time_string;
+}
+
+/**
+ * @brief Get the string representation (hh:mm:ss) of the time.
+ * @param time The Time object.
+ * @return Returns the string representation of the time.
+ * @note The caller must free the returned string.
+ */
+char *time_ascii_string(Time time) {
+    char *time_string = NULL;
+    struct tm tm = {0};
+    return_value_if_fail(__is_valid_time(time), NULL);
+
+    tm.tm_hour = time.hour;
+    tm.tm_min = time.minute;
+    tm.tm_sec = time.second;
+
+    time_string = (char *)calloc(9, sizeof(char));
+    return_value_if_fail(time_string != NULL, NULL);
+
+    strftime(time_string, 9, "%H:%M:%S", &tm);
     return time_string;
 }
 
@@ -1013,4 +1035,33 @@ char *datetime_to_string(DateTime datetime) {
     free(date_str);
     free(time_str);
     return datetime_str;
+}
+
+/**
+ * @brief Get the string representation (Day Mon dd hh:mm:ss yyyy) of the datetime.
+ * @param datetime DateTime Time object.
+ * @return Returns the string representation of the datetime.
+ * @note The caller must free the returned string.
+ */
+char *datetime_ascii_string(DateTime datetime) {
+    char *datetime_string = NULL;
+    struct tm tm = {0};
+    char weekday_abbr[4] = {0};
+    return_value_if_fail(__is_valid_datetime(datetime), NULL);
+
+    tm.tm_year = datetime.date.year - 1900;
+    tm.tm_mon = datetime.date.month - 1;
+    tm.tm_mday = datetime.date.day;
+    tm.tm_hour = datetime.time.hour;
+    tm.tm_min = datetime.time.minute;
+    tm.tm_sec = datetime.time.second;
+
+    datetime_string = (char *)calloc(25, sizeof(char));
+    return_value_if_fail(datetime_string != NULL, NULL);
+
+    strncpy(weekday_abbr, weekday_name(weekday(datetime.date.year, datetime.date.month, datetime.date.day)), 3);
+    strftime(datetime_string, 22, " %b %d %H:%M:%S %Y", &tm);
+    memmove(datetime_string + 3, datetime_string, 21);
+    memcpy(datetime_string, weekday_abbr, 3);
+    return datetime_string;
 }

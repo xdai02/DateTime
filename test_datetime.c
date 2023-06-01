@@ -606,6 +606,43 @@ void test_time_to_string() {
     printf("[PASS] time_to_string\n");
 }
 
+void test_time_ascii_string() {
+    Time time;
+    char *str;
+
+    time = time_create(0, 0, 0, 0);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "00:00:00") == 0);
+    free(str);
+
+    time = time_create(23, 59, 59, 999);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "23:59:59") == 0);
+    free(str);
+
+    time = time_create(12, 0, 0, 0);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "12:00:00") == 0);
+    free(str);
+
+    time = time_create(12, 30, 0, 0);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "12:30:00") == 0);
+    free(str);
+
+    time = time_create(12, 30, 17, 0);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "12:30:17") == 0);
+    free(str);
+
+    time = time_create(12, 30, 17, 123);
+    str = time_ascii_string(time);
+    assert(strcmp(str, "12:30:17") == 0);
+    free(str);
+
+    printf("[PASS] time_ascii_string\n");
+}
+
 void test_datetime_create() {
     DateTime datetime;
 
@@ -947,6 +984,33 @@ void test_datetime_to_string() {
     printf("[PASS] datetime_to_string\n");
 }
 
+void test_datetime_ascii_string() {
+    DateTime datetime;
+    char *str;
+
+    datetime = datetime_create(2000, JAN, 1, 0, 0, 0, 0);
+    str = datetime_ascii_string(datetime);
+    assert(strcmp(str, "Sat Jan 01 00:00:00 2000") == 0);
+    free(str);
+
+    datetime = datetime_create(2000, FEB, 29, 23, 59, 59, 999);
+    str = datetime_ascii_string(datetime);
+    assert(strcmp(str, "Tue Feb 29 23:59:59 2000") == 0);
+    free(str);
+
+    datetime = datetime_create(2023, MAY, 17, 12, 0, 0, 0);
+    str = datetime_ascii_string(datetime);
+    assert(strcmp(str, "Wed May 17 12:00:00 2023") == 0);
+    free(str);
+
+    datetime = datetime_create(2024, DEC, 4, 12, 30, 0, 0);
+    str = datetime_ascii_string(datetime);
+    assert(strcmp(str, "Wed Dec 04 12:30:00 2024") == 0);
+    free(str);
+
+    printf("[PASS] datetime_ascii_string\n");
+}
+
 int main() {
     test_is_leap_year();
     test_month_name();
@@ -974,6 +1038,7 @@ int main() {
     test_time_add();
     test_time_diff();
     test_time_to_string();
+    test_time_ascii_string();
 
     test_datetime_create();
     test_datetime_now();
@@ -985,6 +1050,7 @@ int main() {
     test_datetime_add();
     test_datetime_diff();
     test_datetime_to_string();
+    test_datetime_ascii_string();
 
     printf("[PASS] All\n");
     return 0;

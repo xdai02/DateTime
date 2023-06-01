@@ -276,6 +276,14 @@ int time_diff(Time time1, Time time2);
 char *time_to_string(Time time);
 
 /**
+ * @brief Get the string representation (hh:mm:ss) of the time.
+ * @param time The Time object.
+ * @return Returns the string representation of the time.
+ * @note The caller must free the returned string.
+ */
+char *time_ascii_string(Time time);
+
+/**
  * @brief Create a DateTime object.
  * @param year The year.
  * @param month The month.
@@ -356,5 +364,13 @@ TimeInterval datetime_diff(DateTime datetime1, DateTime datetime2);
  * @note The caller must free the returned string.
  */
 char *datetime_to_string(DateTime datetime);
+
+/**
+ * @brief Get the string representation (Day Mon dd hh:mm:ss yyyy) of the datetime.
+ * @param datetime DateTime Time object.
+ * @return Returns the string representation of the datetime.
+ * @note The caller must free the returned string.
+ */
+char *datetime_ascii_string(DateTime datetime);
 
 #endif

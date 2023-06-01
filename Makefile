@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS_C89=-std=c89 -pedantic -Wall
-CFLAGS_C99=-std=c99 -pedantic -Wall
+CFLAGS_C89=-std=c89 -pedantic -Wall -O2
+CFLAGS_C99=-std=c99 -pedantic -Wall -O2
 LDFLAGS=
 AR=ar
 LIBNAME=libdatetime.a
