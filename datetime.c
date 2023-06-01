@@ -360,7 +360,7 @@ TimeInterval time_interval_create(int days, int hours, int minutes, int seconds,
  */
 char *time_interval_to_string(TimeInterval time_interval) {
     char *time_interval_string = NULL;
-    exit_if_fail(__is_valid_time_interval(time_interval));
+    return_value_if_fail(__is_valid_time_interval(time_interval), NULL);
 
     time_interval_string = (char *)malloc(sizeof(char) * 128);
     return_value_if_fail(time_interval_string != NULL, NULL);
@@ -481,12 +481,38 @@ int date_diff(Date date1, Date date2) {
  */
 char *date_to_string(Date date) {
     char *date_string = NULL;
-    exit_if_fail(__is_valid_date(date));
+    return_value_if_fail(__is_valid_date(date), NULL);
 
     date_string = (char *)malloc(sizeof(char) * 11);
     return_value_if_fail(date_string != NULL, NULL);
 
     sprintf(date_string, "%04d-%02d-%02d", date.year, date.month, date.day);
+    return date_string;
+}
+
+/**
+ * @brief Get the string representation (Day Mon dd yyyy) of the date.
+ * @param date The Date object.
+ * @return Returns the string representation of the date.
+ * @note The caller must free the returned string.
+ */
+char *date_ascii_string(Date date) {
+    char *date_string = NULL;
+    struct tm tm = {0};
+    char weekday_abbr[4] = {0};
+    return_value_if_fail(__is_valid_date(date), NULL);
+
+    tm.tm_year = date.year - 1900;
+    tm.tm_mon = date.month - 1;
+    tm.tm_mday = date.day;
+
+    date_string = (char *)malloc(sizeof(char) * 16);
+    return_value_if_fail(date_string != NULL, NULL);
+
+    strncpy(weekday_abbr, weekday_name(weekday(date.year, date.month, date.day)), 3);
+    strftime(date_string, 16, "%b %d %Y", &tm);
+    memmove(date_string + 4, date_string, 12);
+    memcpy(date_string, weekday_abbr, 3);
     return date_string;
 }
 
@@ -665,7 +691,7 @@ int time_diff(Time time1, Time time2) {
  */
 char *time_to_string(Time time) {
     char *time_string = NULL;
-    exit_if_fail(__is_valid_time(time));
+    return_value_if_fail(__is_valid_time(time), NULL);
 
     time_string = (char *)malloc(sizeof(char) * 13);
     return_value_if_fail(time_string != NULL, NULL);
@@ -972,7 +998,7 @@ char *datetime_to_string(DateTime datetime) {
     char *datetime_str = NULL;
     char *date_str = NULL;
     char *time_str = NULL;
-    exit_if_fail(__is_valid_datetime(datetime));
+    return_value_if_fail(__is_valid_datetime(datetime), NULL);
 
     date_str = date_to_string(datetime.date);
     time_str = time_to_string(datetime.time);

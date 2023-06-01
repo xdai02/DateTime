@@ -218,6 +218,14 @@ int date_diff(Date date1, Date date2);
 char *date_to_string(Date date);
 
 /**
+ * @brief Get the string representation (Day Mon dd yyyy) of the date.
+ * @param date The Date object.
+ * @return Returns the string representation of the date.
+ * @note The caller must free the returned string.
+ */
+char *date_ascii_string(Date date);
+
+/**
  * @brief Create a Time object.
  * @param hour The hour.
  * @param minute The minute.

@@ -380,6 +380,33 @@ void test_date_to_string() {
     printf("[PASS] date_to_string\n");
 }
 
+void test_date_ascii_string() {
+    Date date;
+    char *str;
+
+    date = date_create(2000, JAN, 1);
+    str = date_ascii_string(date);
+    assert(strcmp(str, "Sat Jan 01 2000") == 0);
+    free(str);
+
+    date = date_create(2000, FEB, 29);
+    str = date_ascii_string(date);
+    assert(strcmp(str, "Tue Feb 29 2000") == 0);
+    free(str);
+
+    date = date_create(2023, MAY, 17);
+    str = date_ascii_string(date);
+    assert(strcmp(str, "Wed May 17 2023") == 0);
+    free(str);
+
+    date = date_create(2024, DEC, 4);
+    str = date_ascii_string(date);
+    assert(strcmp(str, "Wed Dec 04 2024") == 0);
+    free(str);
+
+    printf("[PASS] date_ascii_string\n");
+}
+
 void test_time_create() {
     Time time;
 
@@ -939,6 +966,7 @@ int main() {
     test_date_add();
     test_date_diff();
     test_date_to_string();
+    test_date_ascii_string();
 
     test_time_create();
     test_time_now();
